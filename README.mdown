@@ -5,7 +5,16 @@ Welcome to your personal sandbox, you can’t really break anything so feel free
 You can complete the following tasks with either [SourceTree](http://sourctreeapp.com) (Atlassian’s Git and Mercurial client) or using the command line from Linux or OSX. Or use the [BASH command line tools](http://git-scm.com/download/win) for Windows. 
 
 - - -
+## A word to the wise
+While it's true you cannot really break anything in the bucket-o-sand you should keep the following in mind: 
 
+* We designed this as a practice repo to help you get acquainted with Bitbucket. 
+* At this point we've not designed this tutorial to include pull requests to the source repository, we usually close them with a note thanking you for your time. 
+* This repository is usually a fork of a [source repository](https://bitbucket.org/tutorials/bucket-o-sand). For this reason, when you are ready to start coding you will likely want to create an entirely new repo to use for your project. 
+
+Happy coding! 
+
+---
 ## Using SourceTree 
 
 
