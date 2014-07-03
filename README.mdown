@@ -60,7 +60,7 @@ Learn the Git basics of stage, commit, push when you make a change to the 'sampl
 
 - - -
 
-## Using the command line from Linux, OXS or [GitBash](http://git-scm.com/download/win) for Windows. 
+## Using the command line from Linux, OSX or [GitBash](http://git-scm.com/download/win) for Windows. 
 
 ### Task 1. Clone your repository:
 
