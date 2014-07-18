@@ -1,3 +1,7 @@
+# p2pMessenger
+
+It is based on libPusher and coming PJSIP. 
+
 # libPusher
 
 [![Build Status](https://travis-ci.org/lukeredpath/libPusher.png)](https://travis-ci.org/lukeredpath/libPusher)
