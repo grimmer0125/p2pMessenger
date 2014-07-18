@@ -90,6 +90,8 @@
 {
   if (self.pusherAPI == nil) {
     PTPusherAPI *api = [[PTPusherAPI alloc] initWithKey:PUSHER_API_KEY appID:PUSHER_APP_ID secretKey:PUSHER_API_SECRET];
+//    PTPusherAPI *api = [[PTPusherAPI alloc] initWithKey:@"b6ad97ea51c01c300adc" appID:@"81903" secretKey:@"7da4eacdc53409262803"];
+
     self.pusherAPI = api;
   }
   // we set the socket ID to nil here as we want to receive the events that we are sending

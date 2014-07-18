@@ -10,26 +10,26 @@
 
 @implementation PusherExampleMenuViewController
 
-@synthesize pusher;
+@synthesize pusher, testController;
 
 - (void)awakeFromNib
 {
   NSMutableArray *options = [NSMutableArray array];
   
-  NSMutableDictionary *exampleOne = [NSMutableDictionary dictionary];
-  [exampleOne setObject:@"Subscribe and trigger" forKey:@"name"];
-  [exampleOne setObject:@"Trigger events using the REST API and see them appear in real-time." forKey:@"description"];
-  [exampleOne setObject:@"PusherEventsViewController" forKey:@"controllerClass"];
-  [options addObject:exampleOne];
-  
-  NSMutableDictionary *exampleTwo = [NSMutableDictionary dictionary];
-  [exampleTwo setObject:@"Presence channels" forKey:@"name"];
-  [exampleTwo setObject:@"Connect multiple clients and see them announced." forKey:@"description"];
-  [exampleTwo setObject:@"PusherPresenceEventsViewController" forKey:@"controllerClass"];
-  [options addObject:exampleTwo];
+//  NSMutableDictionary *exampleOne = [NSMutableDictionary dictionary];
+//  [exampleOne setObject:@"Subscribe and trigger" forKey:@"name"];
+//  [exampleOne setObject:@"Trigger events using the REST API and see them appear in real-time." forKey:@"description"];
+//  [exampleOne setObject:@"PusherEventsViewController" forKey:@"controllerClass"];
+//  [options addObject:exampleOne];
+//  
+//  NSMutableDictionary *exampleTwo = [NSMutableDictionary dictionary];
+//  [exampleTwo setObject:@"Presence channels" forKey:@"name"];
+//  [exampleTwo setObject:@"Connect multiple clients and see them announced." forKey:@"description"];
+//  [exampleTwo setObject:@"PusherPresenceEventsViewController" forKey:@"controllerClass"];
+//  [options addObject:exampleTwo];
   
   NSMutableDictionary *exampleThree = [NSMutableDictionary dictionary];
-  [exampleThree setObject:@"Reactive events" forKey:@"name"];
+  [exampleThree setObject:@"Test p2p" forKey:@"name"];
   [exampleThree setObject:@"Demonstrates using the ReactiveExtensions API." forKey:@"description"];
   [exampleThree setObject:@"ReactiveEventsViewController" forKey:@"controllerClass"];
   [options addObject:exampleThree];
@@ -73,9 +73,12 @@
   Class controllerClass = NSClassFromString([example objectForKey:@"controllerClass"]);
   NSAssert1(controllerClass, @"Controller class %@ does not exist! Typo?", [example objectForKey:@"controllerClass"]);
   
-  UIViewController *viewController = [[controllerClass alloc] init];
-  [viewController performSelector:@selector(setPusher:) withObject:self.pusher];
-  [self.navigationController pushViewController:viewController animated:YES];
+    if (self.testController==nil) {
+        self.testController = [[controllerClass alloc] init];
+        [self.testController performSelector:@selector(setPusher:) withObject:self.pusher];
+
+    }
+  [self.navigationController pushViewController:self.testController animated:YES];
 }
 
 @end
