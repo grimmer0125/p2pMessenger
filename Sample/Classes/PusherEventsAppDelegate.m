@@ -31,6 +31,10 @@
   
   // log all events received, regardless of which channel they come from
   [[self.pusherClient allEvents] subscribeNext:^(PTPusherEvent *event) {
+      
+    NSString *eventName= event.name;
+  
+      
     NSLog(@"[pusher] Received event %@", event);
   }];
   

@@ -14,6 +14,10 @@
 		4D81597F1712C6CA0013A485 /* Pusher.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D81597E1712C6CA0013A485 /* Pusher.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D5C4E7E0F2A4C92B9D85932 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F700C4637DC43EFA335D40F /* libPods.a */; };
 		6D926C9364F64493B0A7BE5A /* libPods-specs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34CD0B6EB8B94D28B0AEC265 /* libPods-specs.a */; };
+		8ED28249197A208800906180 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8ED28248197A208800906180 /* Images.xcassets */; };
+		8ED2824D197A223400906180 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8ED2824A197A223400906180 /* Icon.png */; };
+		8ED2824E197A223400906180 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8ED2824B197A223400906180 /* Icon@2x.png */; };
+		8ED2824F197A223400906180 /* Icon120.png in Resources */ = {isa = PBXBuildFile; fileRef = 8ED2824C197A223400906180 /* Icon120.png */; };
 		A304896C1667AAB4009511CB /* PTPusherChannelAuthorizationOperationSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = A304895E1667A8A6009511CB /* PTPusherChannelAuthorizationOperationSpec.m */; };
 		A30575D115233CC800DA19BD /* PTPusherPresenceChannelSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = A30575CE15233C1200DA19BD /* PTPusherPresenceChannelSpec.m */; };
 		A317375B155D2D7D007E4BBA /* PTPusherMockConnectionSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = A3173754155D2CDF007E4BBA /* PTPusherMockConnectionSpec.m */; };
@@ -156,7 +160,7 @@
 
 /* Begin PBXFileReference section */
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		1D6058910D05DD3D006BFB54 /* SampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6058910D05DD3D006BFB54 /* p2pMessenger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = p2pMessenger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		32CA4F630368D1EE00C91783 /* libPusher_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libPusher_Prefix.pch; sourceTree = "<group>"; };
@@ -165,6 +169,10 @@
 		4D81597E1712C6CA0013A485 /* Pusher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pusher.h; sourceTree = "<group>"; };
 		716CF9036AED411BB87C148E /* libPods-specs.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-specs.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8ED01C671977A0C6008575F1 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		8ED28248197A208800906180 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = SampleApp/Images.xcassets; sourceTree = "<group>"; };
+		8ED2824A197A223400906180 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		8ED2824B197A223400906180 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
+		8ED2824C197A223400906180 /* Icon120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon120.png; sourceTree = "<group>"; };
 		A304895E1667A8A6009511CB /* PTPusherChannelAuthorizationOperationSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPusherChannelAuthorizationOperationSpec.m; sourceTree = "<group>"; };
 		A30575CE15233C1200DA19BD /* PTPusherPresenceChannelSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPusherPresenceChannelSpec.m; sourceTree = "<group>"; };
 		A30950121525C272008F695B /* PTJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTJSON.m; sourceTree = "<group>"; };
@@ -363,7 +371,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D6058910D05DD3D006BFB54 /* SampleApp.app */,
+				1D6058910D05DD3D006BFB54 /* p2pMessenger.app */,
 				A3D1D2B71158013F009A12AD /* libPusher.a */,
 				A3A1A0EB115813E2001EF877 /* UnitTests.octest */,
 				A3A9F9581496E96100F83617 /* Functional Specs.octest */,
@@ -375,6 +383,10 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				8ED2824A197A223400906180 /* Icon.png */,
+				8ED2824B197A223400906180 /* Icon@2x.png */,
+				8ED2824C197A223400906180 /* Icon120.png */,
+				8ED28248197A208800906180 /* Images.xcassets */,
 				A3E5CBF4184640C3006A54DD /* Default-568h@2x.png */,
 				A3D1D2711157F961009A12AD /* Sample Application */,
 				A394E6F318463D9C004C70A2 /* ReactiveExtensions */,
@@ -659,7 +671,7 @@
 			);
 			name = SampleApp;
 			productName = PusherEvents;
-			productReference = 1D6058910D05DD3D006BFB54 /* SampleApp.app */;
+			productReference = 1D6058910D05DD3D006BFB54 /* p2pMessenger.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A3A1A0EA115813E2001EF877 /* UnitTests */ = {
@@ -681,7 +693,7 @@
 			name = UnitTests;
 			productName = UnitTests;
 			productReference = A3A1A0EB115813E2001EF877 /* UnitTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 		A3A9F9571496E96100F83617 /* Functional Specs */ = {
 			isa = PBXNativeTarget;
@@ -701,7 +713,7 @@
 			name = "Functional Specs";
 			productName = "Functional Specs";
 			productReference = A3A9F9581496E96100F83617 /* Functional Specs.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 		A3D1D2B61158013F009A12AD /* libPusher */ = {
 			isa = PBXNativeTarget;
@@ -748,6 +760,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0500;
+				TargetAttributes = {
+					1D6058900D05DD3D006BFB54 = {
+						DevelopmentTeam = 5SE3885S6Y;
+					};
+				};
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "libPusher" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -775,10 +792,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				A3E5CBFA18464227006A54DD /* ReactiveEventsViewController.xib in Resources */,
+				8ED2824E197A223400906180 /* Icon@2x.png in Resources */,
 				A3D1D2891157FA30009A12AD /* MainWindow.xib in Resources */,
 				A3E5CBF5184640C3006A54DD /* Default-568h@2x.png in Resources */,
+				8ED28249197A208800906180 /* Images.xcassets in Resources */,
 				A3D1D28B1157FA30009A12AD /* PusherEventsViewController.xib in Resources */,
+				8ED2824D197A223400906180 /* Icon.png in Resources */,
 				A3FE41CC11811161009CF5D7 /* NewEventViewController.xib in Resources */,
+				8ED2824F197A223400906180 /* Icon120.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1079,7 +1100,10 @@
 			baseConfigurationReference = A315780A14D0751C000136A9 /* Pods.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DSTROOT = /tmp/xcodeproj.dst;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1089,7 +1113,8 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "libPusher-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				PRODUCT_NAME = SampleApp;
+				PRODUCT_NAME = p2pMessenger;
+				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -1099,7 +1124,10 @@
 			baseConfigurationReference = A315780A14D0751C000136A9 /* Pods.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				DSTROOT = /tmp/xcodeproj.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1107,7 +1135,8 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "libPusher-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				PRODUCT_NAME = SampleApp;
+				PRODUCT_NAME = p2pMessenger;
+				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
