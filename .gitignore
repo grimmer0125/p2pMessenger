@@ -9,7 +9,6 @@ build/*
 .DS_Store
 profile
 
-Constants.h
 *.xcodeproj/xcuserdata
 *.xcodeproj/*.xcworkspace/xcuserdata
 *.xcworkspace/xcuserdata
