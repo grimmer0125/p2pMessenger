@@ -29,7 +29,7 @@
 //  [options addObject:exampleTwo];
   
   NSMutableDictionary *exampleThree = [NSMutableDictionary dictionary];
-  [exampleThree setObject:@"Test p2p" forKey:@"name"];
+  [exampleThree setObject:@"Test Relay & P2P" forKey:@"name"];
   [exampleThree setObject:@"Demonstrates using the ReactiveExtensions API." forKey:@"description"];
   [exampleThree setObject:@"ReactiveEventsViewController" forKey:@"controllerClass"];
   [options addObject:exampleThree];

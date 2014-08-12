@@ -13,6 +13,9 @@
 #import "Reachability.h"
 #import "PTPusher+ReactiveExtensions.h"
 
+#import "stun_hole_puncher.h"
+
+
 // All events will be logged
 #define kLOG_ALL_EVENTS
 
@@ -43,7 +46,7 @@
   
   [self.window makeKeyAndVisible];
   
-  [self.pusherClient connect];
+  [self.pusherClient connect];     
 }
 
 #pragma mark - Reachability
