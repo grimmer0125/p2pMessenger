@@ -111,8 +111,8 @@
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xhZ-HE-Ibj">
-                    <rect key="frame" x="235" y="78" width="56" height="30"/>
-                    <state key="normal" title="present">
+                    <rect key="frame" x="212" y="74" width="103" height="40"/>
+                    <state key="normal" title="Present">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <connections>
@@ -121,6 +121,7 @@
                 </button>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <point key="canvasLocation" x="309" y="254"/>
         </view>
     </objects>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

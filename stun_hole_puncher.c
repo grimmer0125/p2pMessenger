@@ -169,7 +169,7 @@ pj_mutex_t *mt_mutex;
 
 static void puching_timer_callback(pj_timer_heap_t *ht, pj_timer_entry *e)
 {
-    printf("timer is running\n");
+//    printf("timer is running\n");
 
     if(0 == LOCKPOOL(mt_mutex))
     {
@@ -200,18 +200,22 @@ static void puching_timer_callback(pj_timer_heap_t *ht, pj_timer_entry *e)
 //        pj_str_t ns = pj_str("192.168.11.2");
 //        pj_sockaddr_init(pj_AF_INET(), &dst2A, &ns, port);
         
-        printf("send punching\n");
+        pj_sockaddr *remoteAdr = &(matched_peer->remote_target_addr);
+
+        char straddr[PJ_INET6_ADDRSTRLEN+10];
+        
+        pj_sockaddr_print(remoteAdr, straddr, sizeof(straddr), 3);
+        
+        printf("P2P:Send Punching to %s\n",straddr);
 
         char punching_byte = BYTE_PUNCHING;
         
-        pj_sockaddr *remoteAdr = &(matched_peer->remote_target_addr);
-
         pj_stun_sock_sendto(peer->stun_sock, NULL, &punching_byte, 1, 0,
                             remoteAdr, pj_sockaddr_get_len(remoteAdr));
         
         pj_time_val  delay ;
-        delay.sec = 1 ;
-        delay.msec = 0 ;
+        delay.sec = 0 ;
+        delay.msec = MS_PUNCHING ;
         
         pj_timer_heap_schedule(g.stun_config.timer_heap , e, &delay);
         
@@ -486,7 +490,7 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
         
         if (pj_strcmp(&remote_mapped_ip_str, &self_map_ip)==0)
         {
-            
+            printf("P2P:Start hole punching, Lan\n");
             //the same lan
 
             pj_sockaddr dst;
@@ -504,6 +508,8 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
         else
         {
             //use map_adr
+            
+            printf("P2P:Start hole punching, Wan\n");
 
             pj_sockaddr dst;
 //            pj_str_t ns = pj_str((char*)remote_local_ip);
@@ -520,9 +526,8 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
         entry->user_data = matched_peer;
         
         pj_time_val  delay ;
-        delay.sec = 1 ;
-        delay.msec = 0 ;
-        
+        delay.sec = 0 ;
+        delay.msec = MS_PUNCHING ;
         
         pj_timer_heap_schedule(g.stun_config.timer_heap , entry, &delay);
         
@@ -556,7 +561,7 @@ int mk_sendata(const char* hole_punching_id, const char *data, int datalen)
 {    
     if(g.inited && 0 == LOCKPOOL(mt_mutex))
     {
-        printf("send data");
+        printf("P2P:Send data\n");
 
         struct peer *matched_peer = find_matched_peer(hole_punching_id);
         
@@ -801,8 +806,6 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
 				      const pj_sockaddr_t *src_addr,
 				      unsigned addr_len)
 {
-    printf("get data\n");
- 
     if(0 == LOCKPOOL(mt_mutex))
     {
         struct peer *peer = (struct peer*) pj_stun_sock_get_user_data(stun_sock);
@@ -821,6 +824,8 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
             char *only_byte= (char*)pkt;
             if (*only_byte==BYTE_PUNCHING)
             {
+                printf("P2P:Get punching\n");
+
                 //缺點是這邊認為punching成功後, 對方只發1個byte=BYTE_PUNCHING_RESPONSE,
                 //還是只能代表punching的意思,
                 //
@@ -839,6 +844,8 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
             }
             else if (*only_byte==BYTE_PUNCHING_RESPONSE)
             {
+                printf("P2P:Get punching response\n");
+
                 if (pre_both_OK==PJ_FALSE) {
                     matched_peer->got_remote_punching_reponses=PJ_TRUE;
                 }
@@ -850,6 +857,8 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
             }
             else
             {
+                printf("P2P:Get other\n");
+
                 if (matched_peer->got_remote_punching && pre_both_OK==PJ_FALSE) {
                     
                     //如果剛好對方送的response lost掉, 第一個任何其他 包也算
@@ -870,6 +879,8 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
         }
         else
         {
+            printf("P2P:Get others\n");
+
             //如果剛好對方送的response lost掉, 第一個任何其他 包也算
             if (matched_peer->got_remote_punching && pre_both_OK==PJ_FALSE) {
                 

@@ -26,7 +26,7 @@
 #include <pjnath.h>
 
 #define STUN_SERVER "stun.counterpath.com"
-
+#define MS_PUNCHING 1000
 
 //#define INCLUDE_STUN_TEST	    1
 //#define INCLUDE_ICE_TEST	    1

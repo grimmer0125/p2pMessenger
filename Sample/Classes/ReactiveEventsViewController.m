@@ -86,6 +86,30 @@ void runOnMainQueue(void(^block)(void))
       NSLog(@"[pusher] Received p2p event %@", event);
       
     }];
+    
+
+    
+    //        [[NSUserDefaults standardUserDefaults] setObject:versionPreference forKey:@"version_preference"];
+    //
+    //
+    //        NSUserDefaults* ud = [NSUserDefaults standardUserDefaults];
+    //        if([ud objectForKey:kSSLSwitch] == nil)
+    //        {
+    //            [ud setBool:true forKey:kSSLSwitch];
+    //        }
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    NSUserDefaults* ud = [NSUserDefaults standardUserDefaults];
+    
+    NSString *saveNmae = [ud objectForKey:PUSHER_DATA_NAME];
+    
+    if (saveNmae) {
+        [self.nameField setText:saveNmae];
+    }
 }
 
 - (void)handleIncomingPusherEvent:(PTPusherEvent *)event
@@ -94,7 +118,7 @@ void runOnMainQueue(void(^block)(void))
 //    NSString *eventName= event.name;
     if ([event.name isEqualToString:PUSHER_EVENT_LEAVE]) {
         
-        NSString *leaveName = event.data[@"name"];
+        NSString *leaveName = event.data[PUSHER_DATA_NAME];
         
         if ([self.onlineArray containsObject:leaveName]) {
             [self.onlineArray removeObject:leaveName];
@@ -103,7 +127,7 @@ void runOnMainQueue(void(^block)(void))
     }
     else if ([event.name isEqualToString:PUSHER_EVENT_ENTER])
     {
-        NSString *enterName = event.data[@"name"];
+        NSString *enterName = event.data[PUSHER_DATA_NAME];
 
         if (enterName) {
 
@@ -111,10 +135,16 @@ void runOnMainQueue(void(^block)(void))
             {
                 if ([enterName isEqualToString:self.sentName]==false) {
                     [self sendEnterChatRoom:self.sentName];
+                    
+                    [self.onlineArray addObject:enterName];
+
+                }
+                else
+                {
+                    [self.onlineArray insertObject:enterName atIndex:0];//addObject:enterName];
                 }
 
                 //add
-                [self.onlineArray addObject:enterName];
                 [self.onlineTableView reloadData];
             }
         }
@@ -146,32 +176,39 @@ void runOnMainQueue(void(^block)(void))
     }
     else if ([event.name isEqualToString:PUSHER_EVENT_P2P_INVITE])
     {
-        NSString *toName = event.data[PUSHER_DATA_TO];
-        if ([toName isEqualToString:self.sentName]==false) {
-            return;
-        }
-        
         NSString *fromName = event.data[PUSHER_DATA_FROM];
+        NSString *toName = event.data[PUSHER_DATA_TO];
+        
         NSString *mappedIP = event.data[PUSHER_DATA_MAPPEDIP];
         NSString *mappedPort = event.data[PUSHER_DATA_MAPPEDPORT];
         NSString *localIP = event.data[PUSHER_DATA_LOCALIP];
         NSString *localPort = event.data[PUSHER_DATA_LOCALPORT];
-
+        
+        NSLog(@"P2P:Get invite from:%@;%@:%@;%@:%@",fromName,mappedIP,mappedPort,localIP,localPort);
+//        NSLog(@"P2P:Get invite from:%@",fromName);
+        
+        if ([toName isEqualToString:self.sentName]==false) {
+            return;
+        }
+        
         [self mk_receiveInvite:fromName mappedIP:mappedIP mappedPort:mappedPort localIP:localIP localPort:localPort];
         
     }
     else if ([event.name isEqualToString:PUSHER_EVENT_P2P_INVITE_RESPONSE])
     {
         NSString *toName = event.data[PUSHER_DATA_TO];
-        if ([toName isEqualToString:self.sentName]==false) {
-            return;
-        }
         
         NSString *fromName = event.data[PUSHER_DATA_FROM];
         NSString *mappedIP = event.data[PUSHER_DATA_MAPPEDIP];
         NSString *mappedPort = event.data[PUSHER_DATA_MAPPEDPORT];
         NSString *localIP = event.data[PUSHER_DATA_LOCALIP];
         NSString *localPort = event.data[PUSHER_DATA_LOCALPORT];
+        
+        NSLog(@"P2P:Get invite response from:%@;%@:%@;%@:%@",fromName,mappedIP,mappedPort,localIP,localPort);
+        
+        if ([toName isEqualToString:self.sentName]==false) {
+            return;
+        }
         
         [self mk_receiveInviteResponse:fromName mappedIP:mappedIP mappedPort:mappedPort localIP:localIP localPort:localPort];
     }
@@ -200,13 +237,18 @@ void runOnMainQueue(void(^block)(void))
 
     if (nameField.text != nil && nameField.text.length > 0){// && [nameField.text isEqualToString:self.sentName]==false) {
         
-        if (self.sentName!=nil) {
+        if (self.sentName!=nil && [self.sentName isEqualToString:nameField.text]==false) {
+            
+            [self closeAllSesion];
             [self sendLeaveChatRoom:self.sentName];
         }
         
         [self sendEnterChatRoom:nameField.text];
         
         self.sentName = [NSString stringWithFormat:@"%@",nameField.text];
+        
+        NSUserDefaults* ud = [NSUserDefaults standardUserDefaults];
+        [ud setObject:self.sentName forKey:PUSHER_DATA_NAME];
     }
 }
 
@@ -390,10 +432,13 @@ void runOnMainQueue(void(^block)(void))
     
     cell.textLabel.text = [self.onlineArray objectAtIndex:indexPath.row];
     
-    if (true)//[cell.textLabel.text isEqualToString:self.sentName]==false)
+    if (TRUE)//[cell.textLabel.text isEqualToString:self.sentName]==false)
     {
         cell.detailTextLabel.text = [self tryGetStatusText:cell.textLabel.text];//@"p2p disconnected";
-
+    }
+    
+    if ([cell.textLabel.text isEqualToString:self.sentName]==false)
+    {
         int tryCount = [self tryGetTryCount:cell.textLabel.text];
         NSString *tryCountStr = [NSString stringWithFormat:@"%d",tryCount];
         JSBadgeView *badge =  (JSBadgeView *)[cell.contentView viewWithTag:2];
@@ -407,21 +452,21 @@ void runOnMainQueue(void(^block)(void))
         CGPoint shiftPoint = CGPointMake(size+180,0);
         [badge setBadgePositionAdjustment:shiftPoint];
         badge.badgeText = tryCountStr;
-
+        
         int successCount = [self tryGetSuccessCount:cell.textLabel.text];
         NSString *trySuccessStr = [NSString stringWithFormat:@"%d",successCount];
         JSBadgeView *badge3 =  (JSBadgeView *)[cell.contentView viewWithTag:3];
-
+        
         if (!badge3) {
             
             badge3 = [[JSBadgeView alloc] initWithParentView:cell.contentView alignment:JSBadgeViewAlignmentCenterLeft];
-//            [badge3 setTintColor:[UIColor purpleColor]];
-//            [badge3 setBadgeShadowColor:[UIColor yellowColor]];
-//            [badge3 setBadgeStrokeColor:[UIColor blueColor]];
+            //            [badge3 setTintColor:[UIColor purpleColor]];
+            //            [badge3 setBadgeShadowColor:[UIColor yellowColor]];
+            //            [badge3 setBadgeStrokeColor:[UIColor blueColor]];
             [badge3 setBadgeTextColor:[UIColor purpleColor]];
-//            [badge3 setBackgroundColor:[UIColor blackColor]];
-//            [badge3 setBadgeTextShadowColor:[UIColor blackColor]];
-//            [badge3 setBadgeOverlayColor:[UIColor blackColor]];
+            //            [badge3 setBackgroundColor:[UIColor blackColor]];
+            //            [badge3 setBadgeTextShadowColor:[UIColor blackColor]];
+            //            [badge3 setBadgeOverlayColor:[UIColor blackColor]];
             [badge3 setTag:3];
         }
         int size3 = [trySuccessStr sizeWithFont:[UIFont systemFontOfSize:17.0]].width;
@@ -429,17 +474,34 @@ void runOnMainQueue(void(^block)(void))
         [badge3 setBadgePositionAdjustment:shiftPoint3];
         badge3.badgeText = trySuccessStr;
         
-        
         UIButton *p2pBtn=[UIButton buttonWithType:UIButtonTypeRoundedRect];
         [p2pBtn setFrame:CGRectMake(200,5, 120, 40)];
-        p2pBtn.tag=indexPath.row;
+        p2pBtn.tag=4;
         [p2pBtn setTitle:@"send p2p msg" forState:UIControlStateNormal];
+        p2pBtn.accessibilityHint = [NSString stringWithFormat:@"%@",cell.textLabel.text];
 
-        p2pBtn.accessibilityHint =[NSString stringWithFormat:@"%@",cell.textLabel.text];
         
         [p2pBtn addTarget:self action:@selector(mk_start_stun_msg:) forControlEvents:UIControlEventTouchUpInside];
         [cell.contentView addSubview:p2pBtn];
+    }
+    else
+    {
         
+        JSBadgeView *badge =  (JSBadgeView *)[cell.contentView viewWithTag:2];
+        if (badge) {
+            [badge removeFromSuperview];
+        }
+        
+        JSBadgeView *badge3 =  (JSBadgeView *)[cell.contentView viewWithTag:3];
+        if (badge3) {
+            [badge3 removeFromSuperview];
+        }
+        
+        UIButton *p2pBtn =  (UIButton *)[cell.contentView viewWithTag:4];
+
+        if (p2pBtn) {
+            [p2pBtn removeFromSuperview];
+        }
     }
 
     return cell;
@@ -449,7 +511,6 @@ void runOnMainQueue(void(^block)(void))
 // p2p thread
 void mk_punching_result(const char* hole_punching_id, pj_status_t status,void *user_data)
 {
-    
     NSString *holePunchingID= [NSString stringWithUTF8String:hole_punching_id];
 
 //    NSString *holePunchingID = [NSString stringWithFormat:@"%@;msg",remotename];
@@ -464,6 +525,7 @@ void mk_punching_result(const char* hole_punching_id, pj_status_t status,void *u
     
     if (status ==PJ_SUCCESS) {
         
+
         //hanlde success
         int successCount = [[userDict objectForKey:KEY_P2PSUCCESSCOUNT] intValue];
         
@@ -472,11 +534,10 @@ void mk_punching_result(const char* hole_punching_id, pj_status_t status,void *u
         NSNumber *successNewNum = [NSNumber numberWithInt:successCount];
         [userDict setObject:successNewNum forKey:KEY_P2PSUCCESSCOUNT];
         
-        NSLog(@"set success ++");
-
-        
         NSString *message = [userDict objectForKey:KEY_MESSAGE];
         
+        NSLog(@"P2P: punching OK:%@",message);
+
         NSNumber *statusnumber = [NSNumber numberWithInt:P2P_SUCCESS];
         [userDict setObject:statusnumber forKey:KEY_P2PSTATUS];
         
@@ -569,6 +630,8 @@ void mk_binding_result(const char* hole_punching_id,
                        pj_status_t status, void *inUserData)
 {
     printf("in %s\n", __func__);
+    
+    NSLog(@"P2P:get binding result");
  
     NSString *holePunchingID= [NSString stringWithUTF8String:hole_punching_id];
     
@@ -617,6 +680,10 @@ void mk_binding_result(const char* hole_punching_id,
             if (remoteName && mapIp && mapPort && localIp && localPort) {
                 [selfController mk_sendInvite:remoteName mappedIP:mapIp mappedPort:mapPort localIP:localIp localPort:localPort];
             }
+            else
+            {
+                int kkk=0;
+            }
             
             NSNumber *statusnumber = [NSNumber numberWithInt:P2P_ACTIVE_SENDING_INVITE];
             [userDict setObject:statusnumber forKey:KEY_P2PSTATUS];
@@ -626,6 +693,10 @@ void mk_binding_result(const char* hole_punching_id,
             //發invite response給對方
             if (remoteName && mapIp && mapPort && localIp && localPort) {
                 [selfController mk_sendInviteResponse:remoteName mappedIP:mapIp mappedPort:mapPort localIP:localIp localPort:localPort];
+            }
+            else
+            {
+                int kkk=0;
             }
             
             NSNumber *statusnumber = [NSNumber numberWithInt:P2P_PASSIVE_HOLE_PUNCHING];
@@ -645,7 +716,15 @@ void mk_binding_result(const char* hole_punching_id,
                     mk_start_hole_punching(hole_punching_id, [remotemapIP UTF8String],[remotemapPort intValue],[remotelocalIP UTF8String],[remotelocalPort intValue],   mk_punching_result,  inUserData);
                 });
             }
+            else
+            {
+                int kkk=0;
+            }
 
+        }
+        else
+        {
+            int kkk=0;
         }
     }
     else
@@ -655,6 +734,7 @@ void mk_binding_result(const char* hole_punching_id,
         
         //1. 關掉
         
+        //to prevent recursive lock
         runOnMainQueue( ^{
             mk_close_sock([holePunchingID UTF8String]);
         });
@@ -680,6 +760,8 @@ void mk_binding_result(const char* hole_punching_id,
 - (void)mk_sendInvite:(NSString*)remotename mappedIP:(NSString*)mappedIP mappedPort:(NSString*)mappedPort localIP:(NSString*)localIP localPort:(NSString*)localPort
 {
     if (self.sentName) {
+        
+        NSLog(@"P2P:Send invite to:%@;%@:%@;%@:%@",remotename,mappedIP,mappedPort,localIP,localPort);
         
         [self.api triggerEvent:PUSHER_EVENT_P2P_INVITE onChannel:PUSHER_CHANNEL data:@{PUSHER_DATA_FROM:self.sentName, PUSHER_DATA_TO:remotename,
                       PUSHER_DATA_MAPPEDIP:mappedIP,
@@ -777,6 +859,8 @@ void mk_binding_result(const char* hole_punching_id,
 {
     if (self.sentName) {
         
+        NSLog(@"P2P:Send invite response to:%@;%@:%@;%@:%@",remotename,mappedIP,mappedPort,localIP,localPort);
+        
         [self.api triggerEvent:PUSHER_EVENT_P2P_INVITE_RESPONSE onChannel:PUSHER_CHANNEL data:@{PUSHER_DATA_FROM:self.sentName, PUSHER_DATA_TO:remotename,
                     PUSHER_DATA_MAPPEDIP:mappedIP,
                    PUSHER_DATA_MAPPEDPORT:mappedPort,
@@ -823,30 +907,70 @@ void mk_binding_result(const char* hole_punching_id,
 
 - (void)mk_sendCloseSession:(NSString*)remotename
 {
+    NSLog(@"P2P:Send close to:%@;",remotename);
+    
     if (self.sentName) {
+        
         [self.api triggerEvent:PUSHER_EVENT_P2P_CLOSE onChannel:PUSHER_CHANNEL data:@{PUSHER_DATA_FROM:self.sentName, PUSHER_DATA_TO:remotename                                                                                      } socketID:nil];
     }
 }
 
 - (void)mk_receiveCloseSession:(NSString*)remotename
 {
+    NSLog(@"P2P:Get close from:%@;",remotename);
+    
     NSString *holePunchingID = [NSString stringWithFormat:@"%@;msg",remotename];
     
     NSMutableDictionary *userDict = [self.userP2PDict objectForKey:holePunchingID];
 
     if (userDict) {
-        NSNumber *statusnumber = [NSNumber numberWithInt:P2P_FAIL];
+        NSNumber *statusnumber = [NSNumber numberWithInt:P2P_NONE];
         [userDict setObject:statusnumber forKey:KEY_P2PSTATUS];
     }
+    
+    mk_close_sock([holePunchingID UTF8String]);
     
     runOnMainQueue( ^{
         [self.onlineTableView reloadData];
     });
-    
-    mk_close_sock([holePunchingID UTF8String]);
 }
 
+-(void)closeAllSesion
+{
+    for (NSString *remoteName in self.onlineArray) {
+        if ([remoteName isEqualToString:self.sentName]==false) {
+            NSString *holePunchingID = [NSString stringWithFormat:@"%@;msg",remoteName];
+            
+            NSMutableDictionary *userDict = [self.userP2PDict objectForKey:holePunchingID];
+            
+            if (userDict) {
+                int statusCode = [[userDict objectForKey:KEY_P2PSTATUS] intValue];
 
+                if (statusCode == P2P_ACTIVE_SENDING_INVITE ||
+                         statusCode == P2P_ACTIVE_HOLE_PUNCHING ||
+                         statusCode == P2P_PASSIVE_HOLE_PUNCHING ||
+                         statusCode == P2P_SUCCESS ||
+                         statusCode == P2P_FAIL)
+                {
+                    mk_close_sock([holePunchingID UTF8String]);
+                    
+                    [self mk_sendCloseSession:remoteName];
+                }
+            }
+        }
+    }
+//    else if (statusCode == P2P_ACTIVE_SENDING_INVITE ||
+//             statusCode == P2P_ACTIVE_HOLE_PUNCHING ||
+//             statusCode == P2P_PASSIVE_HOLE_PUNCHING ||
+//             statusCode == P2P_SUCCESS ||
+//             statusCode == P2P_FAIL)
+//    {
+//        mk_close_sock([holePunchingID UTF8String]);
+//        
+//        if (remoteName) {
+//            [self mk_sendCloseSession:remoteName];
+//        }
+}
 
 - (void)mk_start_stun_msg:(id)sender
 {
@@ -864,6 +988,9 @@ void mk_binding_result(const char* hole_punching_id,
 //    
 //    return;
     
+    if (self.sentName==nil) {
+        return;
+    }
     
     UIButton* p2pButton = (UIButton*)sender;
     NSString  *remoteName = p2pButton.accessibilityHint;
@@ -927,6 +1054,10 @@ void mk_binding_result(const char* hole_punching_id,
              statusCode == P2P_FAIL)
     {
         mk_close_sock([holePunchingID UTF8String]);
+        
+        if (remoteName) {
+            [self mk_sendCloseSession:remoteName];
+        }
         
         needHolePunching=true;
     }
@@ -1013,11 +1144,15 @@ void mk_binding_result(const char* hole_punching_id,
     [super viewDidDisappear:animated];
 
     if (self.sentName) {
-        
+        [self closeAllSesion];
         //清空
         [self sendLeaveChatRoom:self.sentName];
         self.sentName =nil;
         self.nameField.text =nil;
+        [self.onlineArray removeAllObjects];
+        [self.onlineTableView reloadData];
+        [self.textField setText:nil];
+
     }
     
     
