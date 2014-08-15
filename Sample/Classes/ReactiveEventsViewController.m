@@ -348,8 +348,8 @@ void runOnMainQueue(void(^block)(void))
             case P2P_ACTIVE_HOLE_PUNCHING:
                 statusStr = [NSString stringWithFormat:@"P2P_ACTIVE_HOLE_PUNCHING"];
                 break;
-            case P2P_PASSIVE__WAITING_RESPONSE:
-                statusStr = [NSString stringWithFormat:@"P2P_PASSIVE__WAITING_RESPONSE"];
+            case P2P_PASSIVE_WAITING_RESPONSE:
+                statusStr = [NSString stringWithFormat:@"P2P_PASSIVE_WAITING_RESPONSE"];
                 break;
             case P2P_PASSIVE_HOLE_PUNCHING:
                 statusStr = [NSString stringWithFormat:@"P2P_PASSIVE_HOLE_PUNCHING"];
@@ -472,18 +472,32 @@ void mk_punching_result(const char* hole_punching_id, pj_status_t status,void *u
         NSNumber *successNewNum = [NSNumber numberWithInt:successCount];
         [userDict setObject:successNewNum forKey:KEY_P2PSUCCESSCOUNT];
         
+        NSLog(@"set success ++");
+
+        
         NSString *message = [userDict objectForKey:KEY_MESSAGE];
         
-        if (message)
-        {
-            const char *sentdata= [message UTF8String];
-            mk_sendata(hole_punching_id, sentdata, message.length);
+        NSNumber *statusnumber = [NSNumber numberWithInt:P2P_SUCCESS];
+        [userDict setObject:statusnumber forKey:KEY_P2PSTATUS];
+        
+//        if (message)
+//        {
+            //send remaining p2p message
 
-            [userDict removeObjectForKey:KEY_MESSAGE];
-        }
+        const char *sentdata= [message UTF8String];
+        
+        [userDict removeObjectForKey:KEY_MESSAGE];
+
+        runOnMainQueue( ^{
+
+            mk_sendata(hole_punching_id, sentdata, message.length);
+            
+            [selfController.onlineTableView reloadData];
+
+        });
+//        }
         
         
-        //send remaining p2p message
     }
     else
     {
@@ -491,9 +505,9 @@ void mk_punching_result(const char* hole_punching_id, pj_status_t status,void *u
         
     }
     
-    runOnMainQueue( ^{
-        [selfController.onlineTableView reloadData];
-    });
+//    runOnMainQueue( ^{
+//        [selfController.onlineTableView reloadData];
+//    });
     
     
 //    if (userDict)
@@ -568,7 +582,7 @@ void mk_binding_result(const char* hole_punching_id,
     
     int statusCode= [[userDict objectForKey:KEY_P2PSTATUS] intValue];
 
-    NSArray *nameItems = [holePunchingID componentsSeparatedByString:@":"];
+    NSArray *nameItems = [holePunchingID componentsSeparatedByString:@";"];
     NSString *remoteName=nil;
     if (nameItems.count>0) {
         remoteName = [nameItems objectAtIndex:0];
@@ -607,7 +621,7 @@ void mk_binding_result(const char* hole_punching_id,
             NSNumber *statusnumber = [NSNumber numberWithInt:P2P_ACTIVE_SENDING_INVITE];
             [userDict setObject:statusnumber forKey:KEY_P2PSTATUS];
         }
-        else if (statusCode==P2P_PASSIVE__WAITING_RESPONSE)
+        else if (statusCode==P2P_PASSIVE_WAITING_RESPONSE)
         {
             //發invite response給對方
             if (remoteName && mapIp && mapPort && localIp && localPort) {
@@ -625,7 +639,11 @@ void mk_binding_result(const char* hole_punching_id,
             
             if (remotemapIP && remotemapPort && remotelocalIP && remotelocalPort) {
                 //開始hole punching
-                mk_start_hole_punching(hole_punching_id, [remotemapIP UTF8String],[remotemapPort intValue],[remotelocalIP UTF8String],[remotelocalPort intValue],   mk_punching_result,  inUserData);
+                
+                runOnMainQueue( ^{
+
+                    mk_start_hole_punching(hole_punching_id, [remotemapIP UTF8String],[remotemapPort intValue],[remotelocalIP UTF8String],[remotelocalPort intValue],   mk_punching_result,  inUserData);
+                });
             }
 
         }
@@ -636,9 +654,12 @@ void mk_binding_result(const char* hole_punching_id,
         [userDict setObject:statusnumber forKey:KEY_P2PSTATUS];
         
         //1. 關掉
-        mk_close_sock([holePunchingID UTF8String]);
+        
+        runOnMainQueue( ^{
+            mk_close_sock([holePunchingID UTF8String]);
+        });
 
-        if (statusCode == P2P_PASSIVE__WAITING_RESPONSE) {
+        if (statusCode == P2P_PASSIVE_WAITING_RESPONSE) {
             
             //2. 如果對方invite過, 發close
             if (remoteName) {
@@ -686,26 +707,51 @@ void mk_binding_result(const char* hole_punching_id,
     
     int statusCode = [[userDict objectForKey:KEY_P2PSTATUS] intValue];
 
-    if (statusCode == P2P_NONE || statusCode == P2P_FAIL ||
+    if (statusCode == P2P_NONE ||
+        statusCode == P2P_FAIL ||
         statusCode == P2P_SUCCESS) //success 可能是對方沒send close上一次的
     {
-        NSNumber *statusnumber = [NSNumber numberWithInt:P2P_PASSIVE__WAITING_RESPONSE];
+        NSNumber *statusnumber = [NSNumber numberWithInt:P2P_PASSIVE_WAITING_RESPONSE];
         [userDict setObject:statusnumber forKey:KEY_P2PSTATUS];
         
+        NSString *message = nil;
+        
+        NSDateFormatter *objDateformat = [[NSDateFormatter alloc] init];
+        [objDateformat setDateFormat:@"MM-dd HH:mm:ss"];
+        NSString *currentTime = [objDateformat stringFromDate:[NSDate date]];
+        
+//        if (inputTextField.text != nil && inputTextField.text.length>0 )
+//        {
+//            message = [NSString stringWithFormat:@"%@(%@,P2P):%@",self.sentName,currentTime, inputTextField.text];
+//        }
+//        else
+//        {
+        message = [NSString stringWithFormat:@"%@(%@,P2P):default reply",self.sentName,currentTime];
+//        }
+        
+        if (statusCode !=P2P_NONE) {
+            mk_close_sock([holePunchingID UTF8String]);
+        }
+        
     //    try binding
-        [self mk_start_stun_binding:@"default reply(p2p)" userDict:userDict holePunchingID:holePunchingID];
+        [self mk_start_stun_binding:message userDict:userDict holePunchingID:holePunchingID];
+        
+        [userDict setObject:mappedIP forKey:KEY_REMOTEMAPIP];
+        [userDict setObject:mappedPort forKey:KEY_REMOTEMAPPORT];
+        [userDict setObject:localIP forKey:KEY_REMOTELOCALIP];
+        [userDict setObject:localPort forKey:KEY_REMOTELOCALPORT];
 
     }
     else if (statusCode == P2P_ACTIVE_WAITING_RESPONSE)
     {
-        NSNumber *statusnumber = [NSNumber numberWithInt:P2P_PASSIVE__WAITING_RESPONSE];
+        NSNumber *statusnumber = [NSNumber numberWithInt:P2P_PASSIVE_WAITING_RESPONSE];
         [userDict setObject:statusnumber forKey:KEY_P2PSTATUS];
     }
-    else if (statusCode == P2P_PASSIVE__WAITING_RESPONSE)
+    else if (statusCode == P2P_PASSIVE_WAITING_RESPONSE)
     {
         //可能對方重複invite, 先ignore
     }
-    else if (statusCode == P2P_PASSIVE_HOLE_PUNCHING)
+    else if (statusCode == P2P_PASSIVE_HOLE_PUNCHING) //也可能是對方發起新的了!!
     {
         //對方inviter沒收到reponse? 再reponse 一次? 但就要記得自己的ip資訊了
     }
@@ -713,11 +759,13 @@ void mk_binding_result(const char* hole_punching_id,
     {
         //兩邊同時invite, 送ip等info在invite_reponse回去, 要記得自己的ip資訊
 
-        //直接變hole punching
+        //直接變active hole punching
     }
     else if (statusCode == P2P_ACTIVE_HOLE_PUNCHING)
     {
         //ignore, 某些步驟跳太多了
+        
+        //但有可能左邊還在active_hole_punching時,  右邊發起新的invite(兩次發起的人不同) !!! 碰到了,左邊公司網路一直沒有送upd包到中華電信另一個區網(右邊)
     }
     
     runOnMainQueue( ^{
@@ -750,6 +798,14 @@ void mk_binding_result(const char* hole_punching_id,
     int statusCode = [[userDict objectForKey:KEY_P2PSTATUS] intValue];
 
     if (statusCode ==P2P_ACTIVE_SENDING_INVITE) {
+        
+        NSNumber *statusnumber = [NSNumber numberWithInt:P2P_ACTIVE_HOLE_PUNCHING];
+        [userDict setObject:statusnumber forKey:KEY_P2PSTATUS];
+        
+        runOnMainQueue( ^{
+            [self.onlineTableView reloadData];
+        });
+        
 //        NSString *remotemapIP = [userDict objectForKey:KEY_REMOTEMAPIP];
 //        NSString *remotemapPort = [userDict objectForKey:KEY_REMOTEMAPPORT];
 //        
@@ -782,6 +838,10 @@ void mk_binding_result(const char* hole_punching_id,
         NSNumber *statusnumber = [NSNumber numberWithInt:P2P_FAIL];
         [userDict setObject:statusnumber forKey:KEY_P2PSTATUS];
     }
+    
+    runOnMainQueue( ^{
+        [self.onlineTableView reloadData];
+    });
     
     mk_close_sock([holePunchingID UTF8String]);
 }
@@ -852,7 +912,7 @@ void mk_binding_result(const char* hole_punching_id,
     {
         needHolePunching=true;
     }
-    else if (statusCode==P2P_PASSIVE__WAITING_RESPONSE) //假設這兩個都做很快且幾乎都成功,可不中斷重試, 等到他們成功
+    else if (statusCode==P2P_PASSIVE_WAITING_RESPONSE) //假設這兩個都做很快且幾乎都成功,可不中斷重試, 等到他們成功
     {
         //do nothing
     }
@@ -921,16 +981,18 @@ void mk_binding_result(const char* hole_punching_id,
         int successCount = 0;
         NSNumber *successNewNum = [NSNumber numberWithInt:successCount];
         [userDict setObject:successNewNum forKey:KEY_P2PSUCCESSCOUNT];
+        
+        NSLog(@"set success = 0");
     }
     
     [userDict setObject:message forKey:KEY_MESSAGE];
     
     ///由沒有得過對方的ip判斷現在要幹嘛<-改用status, ui層判斷, 但還是刪好了
 //    [userDict removeObjectForKey:KEY_SELFMAPIP];
-    [userDict removeObjectForKey:KEY_REMOTEMAPIP];
-    [userDict removeObjectForKey:KEY_REMOTEMAPPORT];
-    [userDict removeObjectForKey:KEY_REMOTELOCALIP];
-    [userDict removeObjectForKey:KEY_REMOTELOCALPORT];
+//    [userDict removeObjectForKey:KEY_REMOTEMAPIP];
+//    [userDict removeObjectForKey:KEY_REMOTEMAPPORT];
+//    [userDict removeObjectForKey:KEY_REMOTELOCALIP];
+//    [userDict removeObjectForKey:KEY_REMOTELOCALPORT];
     
     mk_create_sock([holePunchingID UTF8String],mk_binding_result, mk_receive_data, (__bridge void *)(self));
 }

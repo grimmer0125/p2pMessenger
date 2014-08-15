@@ -169,10 +169,10 @@ pj_mutex_t *mt_mutex;
 
 static void puching_timer_callback(pj_timer_heap_t *ht, pj_timer_entry *e)
 {
+    printf("timer is running\n");
+
     if(0 == LOCKPOOL(mt_mutex))
     {
-        printf("timer is running");
-        
         struct peer *peer = (struct peer*)e->user_data;
         
         struct peer *matched_peer = find_matched_peerByPeer(peer);
@@ -200,16 +200,27 @@ static void puching_timer_callback(pj_timer_heap_t *ht, pj_timer_entry *e)
 //        pj_str_t ns = pj_str("192.168.11.2");
 //        pj_sockaddr_init(pj_AF_INET(), &dst2A, &ns, port);
         
+        printf("send punching\n");
+
         char punching_byte = BYTE_PUNCHING;
         
         pj_sockaddr *remoteAdr = &(matched_peer->remote_target_addr);
 
         pj_stun_sock_sendto(peer->stun_sock, NULL, &punching_byte, 1, 0,
-                            &remoteAdr, pj_sockaddr_get_len(&remoteAdr));
+                            remoteAdr, pj_sockaddr_get_len(remoteAdr));
         
+        pj_time_val  delay ;
+        delay.sec = 1 ;
+        delay.msec = 0 ;
+        
+        pj_timer_heap_schedule(g.stun_config.timer_heap , e, &delay);
         
         UNLOCKPOOL(mt_mutex);
+        
+//        UNLOCKPOOL(mt_mutex);
     }
+    
+    int kkk2 =0;
     
 }
 
@@ -444,6 +455,7 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
     if(g.inited && 0 == LOCKPOOL(mt_mutex))
     {
 //        struct peer *loop_peer;
+        //若不清掉上一次的可能這次取到之前的 !!!
         struct peer *matched_peer = find_matched_peer(hole_punching_id);
 //        
 //        loop_peer = g.plist.next;
@@ -459,10 +471,13 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
 //        }
         
         if (matched_peer==NULL) {
+            UNLOCKPOOL(mt_mutex);
             return PJ_SUCCESS;
         }
         
         matched_peer->punching_status = PUNCHING_ING;
+        matched_peer->punching_cb=cb1;
+        
         
         pj_str_t remote_mapped_ip_str = pj_str((char*)remote_mapped_ip);
         
@@ -479,6 +494,8 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
             pj_uint16_t port=(pj_uint16_t)remote_local_port;
             pj_sockaddr_init(pj_AF_INET(), &dst, &ns, port);
             
+//            p2p_peer->mapped_addr.addr.sa_family = pj_AF_INET();
+
             matched_peer->remote_target_addr = dst;
             
 //            pj_stun_sock_sendto(peer->stun_sock, NULL, input, strlen(input)+1, 0,
@@ -503,9 +520,14 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
         entry->user_data = matched_peer;
         
         pj_time_val  delay ;
-        delay.sec = 0 ;
-        delay.msec = 100 ;
+        delay.sec = 1 ;
+        delay.msec = 0 ;
+        
+        
         pj_timer_heap_schedule(g.stun_config.timer_heap , entry, &delay);
+        
+        UNLOCKPOOL(mt_mutex);
+
         
         //            0. 開始timer發punching包, 裡面要寫
         //                a. 送的人是誰(對方要寫自己來找出punchingID)
@@ -534,12 +556,16 @@ int mk_sendata(const char* hole_punching_id, const char *data, int datalen)
 {    
     if(g.inited && 0 == LOCKPOOL(mt_mutex))
     {
+        printf("send data");
+
         struct peer *matched_peer = find_matched_peer(hole_punching_id);
         
         pj_sockaddr *remoteAdr = &(matched_peer->remote_target_addr);
         
         pj_stun_sock_sendto(matched_peer->stun_sock, NULL, data, datalen, 0,
-                            &remoteAdr, pj_sockaddr_get_len(&remoteAdr));
+                            remoteAdr, pj_sockaddr_get_len(remoteAdr));
+        
+        UNLOCKPOOL(mt_mutex);
     }
     
     return 0;
@@ -566,6 +592,7 @@ int mk_close_sock(const char* hole_punching_id)
 //        }
         
         if (matched_peer==NULL) {
+            UNLOCKPOOL(mt_mutex);
             return PJ_SUCCESS;
         }
         
@@ -677,6 +704,7 @@ static pj_bool_t stun_sock_on_status(pj_stun_sock *stun_sock,
 
         
 //        struct peer *loop_peer;
+        
         struct peer *matched_peer = find_matched_peerByPeer(peer);
 //
 //        loop_peer = g.plist.next;
@@ -773,97 +801,113 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
 				      const pj_sockaddr_t *src_addr,
 				      unsigned addr_len)
 {
-    struct peer *peer = (struct peer*) pj_stun_sock_get_user_data(stun_sock);
-    
-    struct peer *matched_peer = find_matched_peerByPeer(peer);
-    
-    if (matched_peer==NULL) {
-        return PJ_FALSE;
-    }
-    
-    pj_bool_t pre_both_OK = matched_peer->got_remote_punching && matched_peer->got_remote_punching_reponses;
-    
-    if (pkt_len==1)
+    printf("get data\n");
+ 
+    if(0 == LOCKPOOL(mt_mutex))
     {
-        char *only_byte= (char*)pkt;
-        if (*only_byte==BYTE_PUNCHING)
-        {
-            //缺點是這邊認為punching成功後, 對方只發1個byte=BYTE_PUNCHING_RESPONSE,
-            //還是只能代表punching的意思,
-            //
-            //這邊認為成功後還是要回這個是怕對方沒有收到punching response
-            
-            //got punching 包
-            matched_peer->got_remote_punching=PJ_TRUE;
-            
-            //send back
-            char punching_byte = BYTE_PUNCHING_RESPONSE;
-            
-            pj_sockaddr *remoteAdr = &(matched_peer->remote_target_addr);
-            
-            pj_stun_sock_sendto(peer->stun_sock, NULL, &punching_byte, 1, 0,
-                                &remoteAdr, pj_sockaddr_get_len(&remoteAdr));
+        struct peer *peer = (struct peer*) pj_stun_sock_get_user_data(stun_sock);
+        
+        struct peer *matched_peer = find_matched_peerByPeer(peer);
+        
+        if (matched_peer==NULL) {
+            UNLOCKPOOL(mt_mutex);
+            return PJ_FALSE;
         }
-        else if (*only_byte==BYTE_PUNCHING_RESPONSE)
+        
+        pj_bool_t pre_both_OK = matched_peer->got_remote_punching && matched_peer->got_remote_punching_reponses;
+        
+        if (pkt_len==1)
         {
-            if (pre_both_OK==PJ_FALSE) {
-                matched_peer->got_remote_punching_reponses=PJ_TRUE;
+            char *only_byte= (char*)pkt;
+            if (*only_byte==BYTE_PUNCHING)
+            {
+                //缺點是這邊認為punching成功後, 對方只發1個byte=BYTE_PUNCHING_RESPONSE,
+                //還是只能代表punching的意思,
+                //
+                //這邊認為成功後還是要回這個是怕對方沒有收到punching response
+                
+                //got punching 包
+                matched_peer->got_remote_punching=PJ_TRUE;
+                
+                //send back
+                char punching_byte = BYTE_PUNCHING_RESPONSE;
+                
+                pj_sockaddr *remoteAdr = &(matched_peer->remote_target_addr);
+                
+                pj_stun_sock_sendto(peer->stun_sock, NULL, &punching_byte, 1, 0,
+                                    remoteAdr, pj_sockaddr_get_len(remoteAdr));
+            }
+            else if (*only_byte==BYTE_PUNCHING_RESPONSE)
+            {
+                if (pre_both_OK==PJ_FALSE) {
+                    matched_peer->got_remote_punching_reponses=PJ_TRUE;
+                }
+                else
+                {
+                    //至少punching成功後, 對方可以只發1個byte=BYTE_PUNCHING_RESPONSE for其他意思的
+                    matched_peer->receive_cb(pj_strbuf(&matched_peer->hole_punching_id),pkt,pkt_len,matched_peer->user_data);
+                }
             }
             else
             {
-                //至少punching成功後, 對方可以只發1個byte=BYTE_PUNCHING_RESPONSE for其他意思的
+                if (matched_peer->got_remote_punching && pre_both_OK==PJ_FALSE) {
+                    
+                    //如果剛好對方送的response lost掉, 第一個任何其他 包也算
+                    
+                    // OK
+                    matched_peer->got_remote_punching_reponses=PJ_TRUE;
+                    matched_peer->punching_status = PUNCHING_SUCCESS;
+                    
+    //                stun_punching_result
+                    matched_peer->punching_cb(pj_strbuf(&matched_peer->hole_punching_id),
+                                              PJ_SUCCESS,matched_peer->user_data);
+                    
+                }
+                
+                //receive data
                 matched_peer->receive_cb(pj_strbuf(&matched_peer->hole_punching_id),pkt,pkt_len,matched_peer->user_data);
             }
         }
         else
         {
-            if (matched_peer->got_remote_punching) {
-                
-                //如果剛好對方送的response lost掉, 第一個media 包也算
+            //如果剛好對方送的response lost掉, 第一個任何其他 包也算
+            if (matched_peer->got_remote_punching && pre_both_OK==PJ_FALSE) {
                 
                 // OK
                 matched_peer->got_remote_punching_reponses=PJ_TRUE;
                 matched_peer->punching_status = PUNCHING_SUCCESS;
                 
-//                stun_punching_result
                 matched_peer->punching_cb(pj_strbuf(&matched_peer->hole_punching_id),
                                           PJ_SUCCESS,matched_peer->user_data);
-                
             }
             
             //receive data
+            
             matched_peer->receive_cb(pj_strbuf(&matched_peer->hole_punching_id),pkt,pkt_len,matched_peer->user_data);
         }
-    }
-    else
-    {
-        if (matched_peer->got_remote_punching) {
-            
-            // OK
-            matched_peer->got_remote_punching_reponses=PJ_TRUE;
+        
+        if (pre_both_OK==PJ_FALSE &&
+            matched_peer->got_remote_punching &&
+            matched_peer->got_remote_punching_reponses)
+        {
+            //punching OK
             matched_peer->punching_status = PUNCHING_SUCCESS;
-            
             matched_peer->punching_cb(pj_strbuf(&matched_peer->hole_punching_id),
                                       PJ_SUCCESS,matched_peer->user_data);
+            
+    //        matched_peer->result_cb(pj_strbuf(&matched_peer->hole_punching_id),
+    //                                straddr,
+    //                                straddr_selfaddr,
+    //                                PJ_SUCCESS, matched_peer->user_data);
+            
         }
         
-        //receive data
-        
-        matched_peer->receive_cb(pj_strbuf(&matched_peer->hole_punching_id),pkt,pkt_len,matched_peer->user_data);
+        UNLOCKPOOL(mt_mutex);
+
     }
-    
-    if (pre_both_OK==PJ_FALSE &&
-        matched_peer->got_remote_punching &&
-        matched_peer->got_remote_punching_reponses)
-    {
-        //punching OK
-        matched_peer->punching_status = PUNCHING_SUCCESS;
-        matched_peer->punching_cb(pj_strbuf(&matched_peer->hole_punching_id),
-                                  PJ_SUCCESS,matched_peer->user_data);
-        
-        return PJ_TRUE;
-    }
-    
+
+    return PJ_TRUE;
+
 //    char straddr[PJ_INET6_ADDRSTRLEN+10];
 //
 //    ((char*)pkt)[pkt_len] = '\0';
