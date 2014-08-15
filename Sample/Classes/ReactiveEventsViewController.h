@@ -8,26 +8,16 @@
 
 #import <UIKit/UIKit.h>
 #import "stun_hole_puncher.h"
+#import "stun_process_const.h"
 
+//typedef enum {
+////    TCP_P2P = 0,
+//    UDP_P2P = 1,
+//    TCP_SR = 2,
+////    UDP_SR = 3,
+//} C4miConnectionType;
 
-typedef enum {
-//    TCP_P2P = 0,
-    UDP_P2P = 1,
-    TCP_SR = 2,
-//    UDP_SR = 3,
-} C4miConnectionType;
-
-typedef enum {
-    P2P_NONE =0,
-    P2P_SUCCESS = 1,
-    P2P_FAIL = 2,
-    P2P_WAITTING = 3,
-} P2PStatus;
-
-NSString *KEY_P2PLOCALSOCKET = @"KEY_P2PLOCALSOCKET";
-NSString *KEY_P2PSTATUS = @"KEY_P2PSTATUS";
-NSString *KEY_MESSAGE = @"KEY_MESSAGE";
-NSString *KEY_ADDR = @"KEY_ADDR";
+void runOnMainQueue(void(^block)(void));
 
 @class PTPusher;
 
@@ -54,6 +44,14 @@ NSString *KEY_ADDR = @"KEY_ADDR";
 - (IBAction)sendTextPress:(id)sender;
 - (IBAction)changeNamePress:(id)sender;
 
+void mk_punching_result(const char* hole_punching_id, pj_status_t status,void *user_data);
+
+void mk_receive_data(const char* hole_punching_id,unsigned char *data, int datalen, void *user_data);
+
+void mk_binding_result(const char* hole_punching_id,
+                       char *mapp_addr,
+                       char *local_addr,
+                       pj_status_t status, void *inUserData);
 
 @end
 

@@ -17,14 +17,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
  */
-
-#ifndef stun_hole_puncher__h
-#define stun_hole_puncher__h
+#ifndef stun_hole_puncher_h
+#define stun_hole_puncher_h
 
 
 #include <pjlib.h>
 #include <pjlib-util.h>
 #include <pjnath.h>
+
+#define STUN_SERVER "stun.counterpath.com"
+
 
 //#define INCLUDE_STUN_TEST	    1
 //#define INCLUDE_ICE_TEST	    1
@@ -32,12 +34,37 @@
 //#define INCLUDE_TURN_SOCK_TEST	    1
 //#define INCLUDE_CONCUR_TEST    	    1
 
-
+//int initK();
 //int stun_test_init();
-
 //void closeSock(pj_stun_sock *sock);
-int mk_createSock(const char* holePunchingID);
-int mk_closeSock(const char* holePunchingID);
+
+typedef void (*stun_binding_result)(const char* hole_punching_id,
+                               char *mapp_addr,
+                               char *local_addr,
+                               pj_status_t status,
+                               void *user_data);
+
+typedef void (*stun_punching_result)(const char* hole_punching_id,
+                            pj_status_t status,
+                            void *user_data);
+
+typedef void (*stun_receive_data)(const char* hole_punching_id,
+                         unsigned char *data,
+                         int datalen,
+                        void *user_data);
+
+
+int mk_create_sock(const char* hole_punching_id, stun_binding_result cb, stun_receive_data cb2,void *user_data);
+int mk_close_sock(const char* hole_punching_id);
+
+int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_mapped_ip, int remote_mapped_port, const char *remote_local_ip, int remote_local_port,  stun_punching_result cb, void *user_data);
+
+int mk_sendata(const char* hole_punching_id, const char *data, int datalen);
+
+//void test_startTimer();
+//void test_stopTimer();
+//void registerCallback(on_status cb);
+//void testCallback(struct peer *pr);
 
 //int stun_test(void);
 //int sess_auth_test(void);

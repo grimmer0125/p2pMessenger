@@ -37,7 +37,6 @@
       
     NSString *eventName= event.name;
   
-      
     NSLog(@"[pusher] Received event %@", event);
   }];
   
