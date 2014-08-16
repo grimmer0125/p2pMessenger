@@ -64,7 +64,8 @@ typedef struct peer
     pj_bool_t got_remote_punching;
     pj_bool_t got_remote_punching_reponses;
     
-    pj_str_t hole_punching_id;
+//    pj_str_t hole_punching_id;
+    char *hole_punching_id;
     
     stun_binding_result result_cb;
     stun_receive_data receive_cb;
@@ -220,8 +221,6 @@ static void puching_timer_callback(pj_timer_heap_t *ht, pj_timer_entry *e)
         pj_timer_heap_schedule(g.stun_config.timer_heap , e, &delay);
         
         UNLOCKPOOL(mt_mutex);
-        
-//        UNLOCKPOOL(mt_mutex);
     }
     
     int kkk2 =0;
@@ -355,12 +354,23 @@ int mk_create_sock(const char* hole_punching_id, stun_binding_result cb, stun_re
         }
         
         //    pj_str_t holeID = pj_str(holePunchingID);
-        p2p_peer->hole_punching_id =  pj_str((char*)hole_punching_id);
+        p2p_peer->hole_punching_id =  //pj_str((char*)hole_punching_id);
+        strdup(hole_punching_id);
+        
+//        printf("P2P:hole2:%.*s\n", (int)p2p_peer->hole_punching_id.slen , p2p_peer->hole_punching_id.ptr);
+        
+//        const char *test = pj_strbuf(&p2p_peer->hole_punching_id);
+        printf("P2P:hole punching(by strdup):%s\n",p2p_peer->hole_punching_id);
+        
+
         p2p_peer->result_cb = cb;
         p2p_peer->receive_cb =cb2;
         p2p_peer->user_data = user_data;
         
         pj_list_insert_before(&g.plist, p2p_peer);
+        
+//        struct peer *matched_peer = find_matched_peer(hole_punching_id);
+        
         
         UNLOCKPOOL(mt_mutex);
     }
@@ -438,7 +448,9 @@ struct peer* find_matched_peer(const char* hole_punching_id)
     loop_peer = g.plist.next;
     while (loop_peer != &g.plist)
     {
-        if (pj_strcmp2(&loop_peer->hole_punching_id,hole_punching_id)==0)
+//        printf("%s vs %s",loop_peer->hole_punching_id,hole_punching_id);
+//        printf("size:%lu;%lu",strlen(loop_peer->hole_punching_id),strlen(hole_punching_id));
+        if (strcmp(loop_peer->hole_punching_id, hole_punching_id)==0)//pj_strcmp2(&loop_peer->hole_punching_id,hole_punching_id)==0)
         {
             matched_peer = loop_peer;
             break;
@@ -450,6 +462,10 @@ struct peer* find_matched_peer(const char* hole_punching_id)
 //    if (matched_peer==NULL) {
 //        return NULL;
 //    }
+    
+    if (matched_peer==NULL) {
+        int kk=0;
+    }
     
     return matched_peer;
 }
@@ -481,7 +497,6 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
         
         matched_peer->punching_status = PUNCHING_ING;
         matched_peer->punching_cb=cb1;
-        
         
         pj_str_t remote_mapped_ip_str = pj_str((char*)remote_mapped_ip);
         
@@ -606,7 +621,7 @@ int mk_close_sock(const char* hole_punching_id)
         sock_destory(matched_peer->stun_sock);
         
         pj_list_erase(matched_peer);
-        
+        free(matched_peer->hole_punching_id);
         free(matched_peer);
         
         UNLOCKPOOL(mt_mutex);
@@ -731,7 +746,9 @@ static pj_bool_t stun_sock_on_status(pj_stun_sock *stun_sock,
         }
         
         if (status == PJ_SUCCESS) {
-            printf("peer:%.*s;", (int)matched_peer->hole_punching_id.slen , matched_peer->hole_punching_id.ptr);
+//            printf("peer:%.*s;", (int)matched_peer->hole_punching_id.slen , matched_peer->hole_punching_id.ptr);
+            
+            printf("peer:%s",matched_peer->hole_punching_id);
             
             PJ_LOG(4,(THIS_FILE, "%s success",
                   pj_stun_sock_op_name(op)));
@@ -741,7 +758,7 @@ static pj_bool_t stun_sock_on_status(pj_stun_sock *stun_sock,
             PJ_LOG(1,(THIS_FILE, "%s error: %s",
                   pj_stun_sock_op_name(op), errmsg));
             
-            matched_peer->result_cb(pj_strbuf(&matched_peer->hole_punching_id),
+            matched_peer->result_cb(matched_peer->hole_punching_id,
                                     NULL,NULL,
                                     PJ_FALSE,matched_peer->user_data);
             
@@ -787,7 +804,7 @@ static pj_bool_t stun_sock_on_status(pj_stun_sock *stun_sock,
 //                char *ipp2 =   pj_inet_ntoa(peer->mapped_addr.ipv6 sin6_addr);
 
                 
-                matched_peer->result_cb(pj_strbuf(&matched_peer->hole_punching_id),
+                matched_peer->result_cb(matched_peer->hole_punching_id,
                                         straddr,
                                         straddr_selfaddr,
                                         PJ_SUCCESS, matched_peer->user_data);
@@ -852,7 +869,7 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
                 else
                 {
                     //至少punching成功後, 對方可以只發1個byte=BYTE_PUNCHING_RESPONSE for其他意思的
-                    matched_peer->receive_cb(pj_strbuf(&matched_peer->hole_punching_id),pkt,pkt_len,matched_peer->user_data);
+                    matched_peer->receive_cb(matched_peer->hole_punching_id,pkt,pkt_len,matched_peer->user_data);
                 }
             }
             else
@@ -868,13 +885,13 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
                     matched_peer->punching_status = PUNCHING_SUCCESS;
                     
     //                stun_punching_result
-                    matched_peer->punching_cb(pj_strbuf(&matched_peer->hole_punching_id),
+                    matched_peer->punching_cb(matched_peer->hole_punching_id,
                                               PJ_SUCCESS,matched_peer->user_data);
                     
                 }
                 
                 //receive data
-                matched_peer->receive_cb(pj_strbuf(&matched_peer->hole_punching_id),pkt,pkt_len,matched_peer->user_data);
+                matched_peer->receive_cb(matched_peer->hole_punching_id,pkt,pkt_len,matched_peer->user_data);
             }
         }
         else
@@ -888,13 +905,13 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
                 matched_peer->got_remote_punching_reponses=PJ_TRUE;
                 matched_peer->punching_status = PUNCHING_SUCCESS;
                 
-                matched_peer->punching_cb(pj_strbuf(&matched_peer->hole_punching_id),
+                matched_peer->punching_cb(matched_peer->hole_punching_id,
                                           PJ_SUCCESS,matched_peer->user_data);
             }
             
             //receive data
             
-            matched_peer->receive_cb(pj_strbuf(&matched_peer->hole_punching_id),pkt,pkt_len,matched_peer->user_data);
+            matched_peer->receive_cb(matched_peer->hole_punching_id,pkt,pkt_len,matched_peer->user_data);
         }
         
         if (pre_both_OK==PJ_FALSE &&
@@ -903,7 +920,7 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
         {
             //punching OK
             matched_peer->punching_status = PUNCHING_SUCCESS;
-            matched_peer->punching_cb(pj_strbuf(&matched_peer->hole_punching_id),
+            matched_peer->punching_cb(matched_peer->hole_punching_id,
                                       PJ_SUCCESS,matched_peer->user_data);
             
     //        matched_peer->result_cb(pj_strbuf(&matched_peer->hole_punching_id),

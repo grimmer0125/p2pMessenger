@@ -599,7 +599,7 @@ void mk_receive_data(const char* hole_punching_id, unsigned char *data, int data
 //    NSString *fromName = event.data[PUSHER_DATA_FROM];
     
     NSString *holePunchingID= [NSString stringWithUTF8String:hole_punching_id];
-
+    
     ReactiveEventsViewController *selfController = (__bridge ReactiveEventsViewController*)user_data;
     
     NSMutableDictionary *userDict = [selfController.userP2PDict objectForKey:holePunchingID];
@@ -610,10 +610,38 @@ void mk_receive_data(const char* hole_punching_id, unsigned char *data, int data
     
     if (selfController.sentName) {
         
-        NSString *content = [NSString stringWithUTF8String:(char*)data];
+//        NSString *content = [NSString stringWithUTF8String:(const char*)data];
+//        
+//        
+//        if (content==nil) {
+//            int kk =0;
+//        }
+        
+//        if ([content isEqualToString:@"(null)"])
+//        {
+//            int kkk=0;
+//        }
+        
+        
+        
+        
+        NSString *content= [[NSString alloc] initWithBytes:data length:datalen encoding:NSUTF8StringEncoding];
+
+//        int kkkk=0;
+//        
+//        
+//        int y=0;
+//        int kkk=0;
+        
+        NSLog(@"P2P:get content:%@",content);
+
         
         runOnMainQueue( ^{
 
+//            if (selfController.textView.text==nil) {
+//                int kkk=0;
+//            }
+            
             selfController.textView.text = [NSString stringWithFormat:@"%@\n%@",selfController.textView.text,content];
             
             //            CGPoint p = [self.textView contentOffset];
@@ -1124,6 +1152,9 @@ void mk_binding_result(const char* hole_punching_id,
 //    [userDict removeObjectForKey:KEY_REMOTEMAPPORT];
 //    [userDict removeObjectForKey:KEY_REMOTELOCALIP];
 //    [userDict removeObjectForKey:KEY_REMOTELOCALPORT];
+    
+    const char* hole=[holePunchingID UTF8String];
+    printf("P2P:hole:%s",hole);
     
     mk_create_sock([holePunchingID UTF8String],mk_binding_result, mk_receive_data, (__bridge void *)(self));
 }
