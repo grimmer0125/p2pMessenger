@@ -541,6 +541,21 @@ void mk_punching_result(const char* hole_punching_id, pj_status_t status,void *u
             NSString *message = [userDict objectForKey:KEY_MESSAGE];
             
             NSLog(@"P2P: punching OK:%@",message);
+            
+            const char *sentdata;
+            
+            if (message==nil) {
+                
+                message =[NSString stringWithFormat:@"dummy message"];
+                
+                sentdata= [message UTF8String];
+            }
+            else
+            {
+                sentdata= [message UTF8String];
+
+                [userDict removeObjectForKey:KEY_MESSAGE];
+            }
 
             NSNumber *statusnumber = [NSNumber numberWithInt:P2P_SUCCESS];
             [userDict setObject:statusnumber forKey:KEY_P2PSTATUS];
@@ -549,14 +564,12 @@ void mk_punching_result(const char* hole_punching_id, pj_status_t status,void *u
     //        {
                 //send remaining p2p message
 
-            const char *sentdata= [message UTF8String];
+//            const char *sentdata= [message UTF8String];
             
-            [userDict removeObjectForKey:KEY_MESSAGE];
 
-
-                mk_sendata(hole_punching_id, sentdata, message.length);
-                
-                [selfController.onlineTableView reloadData];
+            mk_sendata(hole_punching_id, sentdata, message.length);
+            
+            [selfController.onlineTableView reloadData];
 
     //        }
             

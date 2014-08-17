@@ -970,6 +970,9 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
                     matched_peer->punching_cb(matched_peer->hole_punching_id,
                                               PJ_SUCCESS,matched_peer->user_data);
                     
+                    pre_both_OK= PJ_TRUE;
+
+                    
                 }
                 
                 //receive data
@@ -989,6 +992,8 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
                 
                 matched_peer->punching_cb(matched_peer->hole_punching_id,
                                           PJ_SUCCESS,matched_peer->user_data);
+                
+                pre_both_OK= PJ_TRUE;
             }
             
             //receive data
