@@ -174,10 +174,23 @@ pj_mutex_t *mt_mutex_write;
 ////    pr->cb(pr->holePunchingID,pr->mapped_addr,PJ_SUCCESS);
 //}
 
+
+static void send_puching(struct peer *peer)
+{
+    pj_sockaddr *remoteAdr = &(peer->remote_target_addr);
+    
+    char straddr[PJ_INET6_ADDRSTRLEN+10];
+    pj_sockaddr_print(remoteAdr, straddr, sizeof(straddr), 3);
+    printf("P2P:Send Punching to %s\n",straddr);
+    
+    char punching_byte = BYTE_PUNCHING;
+    
+    pj_stun_sock_sendto(peer->stun_sock, NULL, &punching_byte, 1, 0,
+                        remoteAdr, pj_sockaddr_get_len(remoteAdr));
+}
+
 static void puching_timer_callback(pj_timer_heap_t *ht, pj_timer_entry *e)
 {
-//    printf("timer is running\n");
-
     if(0 == LOCKPOOL(mt_mutex_write))
     {
         struct peer *peer = (struct peer*)e->user_data;
@@ -187,14 +200,20 @@ static void puching_timer_callback(pj_timer_heap_t *ht, pj_timer_entry *e)
         // find_matched_peerByPeer(peer);
         
         if (matched_peer==NULL) {
+            printf("P2P:punching timer is running but invalid_1\n");
+
             UNLOCKPOOL(mt_mutex_write);
             return;
         }
         
         if (matched_peer->punching_status != PUNCHING_ING) {
+            printf("P2P:punching timer is running but invalid_2\n");
             UNLOCKPOOL(mt_mutex_write);
             return;
         }
+        
+        printf("P2P:punching timer is running_valid\n");
+
         
         //go head
         
@@ -207,18 +226,20 @@ static void puching_timer_callback(pj_timer_heap_t *ht, pj_timer_entry *e)
 //        pj_str_t ns = pj_str("192.168.11.2");
 //        pj_sockaddr_init(pj_AF_INET(), &dst2A, &ns, port);
         
-        pj_sockaddr *remoteAdr = &(matched_peer->remote_target_addr);
+//        pj_sockaddr *remoteAdr = &(matched_peer->remote_target_addr);
+//
+//        char straddr[PJ_INET6_ADDRSTRLEN+10];
+//        
+//        pj_sockaddr_print(remoteAdr, straddr, sizeof(straddr), 3);
+//        
+//        printf("P2P:Send Punching to %s\n",straddr);
+//
+//        char punching_byte = BYTE_PUNCHING;
+//        
+//        pj_stun_sock_sendto(peer->stun_sock, NULL, &punching_byte, 1, 0,
+//                            remoteAdr, pj_sockaddr_get_len(remoteAdr));
 
-        char straddr[PJ_INET6_ADDRSTRLEN+10];
-        
-        pj_sockaddr_print(remoteAdr, straddr, sizeof(straddr), 3);
-        
-        printf("P2P:Send Punching to %s\n",straddr);
-
-        char punching_byte = BYTE_PUNCHING;
-        
-        pj_stun_sock_sendto(peer->stun_sock, NULL, &punching_byte, 1, 0,
-                            remoteAdr, pj_sockaddr_get_len(remoteAdr));
+        send_puching(peer);
         
         pj_time_val  delay ;
         delay.sec = 0 ;
@@ -630,6 +651,8 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
         pj_time_val  delay ;
         delay.sec = 0 ;
         delay.msec = MS_PUNCHING ;
+        
+        send_puching(matched_peer);
         
         pj_timer_heap_schedule(g.stun_config.timer_heap , entry, &delay);
         
