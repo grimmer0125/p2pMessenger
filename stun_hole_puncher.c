@@ -125,14 +125,6 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
 				      const pj_sockaddr_t *src_addr,
 				      unsigned addr_len);
 
-
-static int sock_destory(pj_stun_sock  *stun_sock);
-
-struct peer* find_matched_peerByPeer(struct peer *peer);
-struct peer* find_matched_peer(const char* hole_punching_id);
-
-int init(void);
-
 static void my_perror(const char *title, pj_status_t status)
 {
     char errmsg[PJ_ERR_MSG_SIZE];
@@ -146,6 +138,17 @@ static void my_perror(const char *title, pj_status_t status)
 			    my_perror(#expr, status); \
 			    return status; \
 			}
+
+static int sock_destory(pj_stun_sock  *stun_sock);
+
+struct peer* find_matched_peerByPeer(struct peer *peer);
+struct peer* find_matched_peer(const char* hole_punching_id);
+
+int init(void);
+int add_peer_in_list(struct peer *peerlist, struct peer *p2p_peer);
+
+int remove_peer_in_list(struct peer *p2p_peer);
+
 
 //#define INITPOOLLOCK(x)			(pthread_mutex_init(x, NULL))
 //#define DEINITPOOLLOCK(x)		(pthread_mutex_destroy(x))
@@ -162,6 +165,9 @@ static void my_perror(const char *title, pj_status_t status)
 #define TRYLOCKPOOL(x)			(pj_mutex_trylock(x))
 
 pj_mutex_t *mt_mutex;
+pj_mutex_t *mt_mutex_plist;
+pj_mutex_t *mt_mutex_read;
+pj_mutex_t *mt_mutex_write;
 
 //void testCallback(struct peer *pr)
 //{
@@ -172,7 +178,7 @@ static void puching_timer_callback(pj_timer_heap_t *ht, pj_timer_entry *e)
 {
 //    printf("timer is running\n");
 
-    if(0 == LOCKPOOL(mt_mutex))
+    if(0 == LOCKPOOL(mt_mutex_write))
     {
         struct peer *peer = (struct peer*)e->user_data;
         
@@ -181,12 +187,12 @@ static void puching_timer_callback(pj_timer_heap_t *ht, pj_timer_entry *e)
         // find_matched_peerByPeer(peer);
         
         if (matched_peer==NULL) {
-            UNLOCKPOOL(mt_mutex);
+            UNLOCKPOOL(mt_mutex_write);
             return;
         }
         
         if (matched_peer->punching_status != PUNCHING_ING) {
-            UNLOCKPOOL(mt_mutex);
+            UNLOCKPOOL(mt_mutex_write);
             return;
         }
         
@@ -220,7 +226,7 @@ static void puching_timer_callback(pj_timer_heap_t *ht, pj_timer_entry *e)
         
         pj_timer_heap_schedule(g.stun_config.timer_heap , e, &delay);
         
-        UNLOCKPOOL(mt_mutex);
+        UNLOCKPOOL(mt_mutex_write);
     }
     
     int kkk2 =0;
@@ -293,8 +299,8 @@ int mk_create_sock(const char* hole_punching_id, stun_binding_result cb, stun_re
         }
     }
     
-    if(0 == LOCKPOOL(mt_mutex))
-    {
+//    if(0 == LOCKPOOL(mt_mutex))
+//    {
         /*
          * Create peers
          */
@@ -303,77 +309,77 @@ int mk_create_sock(const char* hole_punching_id, stun_binding_result cb, stun_re
         //2. 把peer, holePunchingID 加入arrray裡
         //3. 設定callback(從server server返回的), 要送給對方, 參數有punchingID跟public ip:port
         
-        struct peer *p2p_peer = malloc(sizeof(peer));
-        
-        p2p_peer->punching_status = PUNCHING_NOTSTART;
-        p2p_peer->got_remote_punching=PJ_FALSE;
-        p2p_peer->got_remote_punching_reponses=PJ_FALSE;
-        
-        pj_stun_sock_cb stun_sock_cb;
-        //char name[] = "peer0";
-        pj_uint16_t port;
-        pj_stun_sock_cfg ss_cfg;
-        pj_str_t server;
-        
-        pj_bzero(&stun_sock_cb, sizeof(stun_sock_cb));
-        stun_sock_cb.on_rx_data = &stun_sock_on_rx_data;
-        stun_sock_cb.on_status = &stun_sock_on_status;
-        
-        p2p_peer->mapped_addr.addr.sa_family = pj_AF_INET();
-        //    g.peer[i].mapped_addr.addr.sa_family = pj_AF_INET();
-        
-        pj_stun_sock_cfg_default(&ss_cfg);
+    struct peer *p2p_peer = malloc(sizeof(peer));
+    
+    p2p_peer->punching_status = PUNCHING_NOTSTART;
+    p2p_peer->got_remote_punching=PJ_FALSE;
+    p2p_peer->got_remote_punching_reponses=PJ_FALSE;
+    
+    pj_stun_sock_cb stun_sock_cb;
+    //char name[] = "peer0";
+    pj_uint16_t port;
+    pj_stun_sock_cfg ss_cfg;
+    pj_str_t server;
+    
+    pj_bzero(&stun_sock_cb, sizeof(stun_sock_cb));
+    stun_sock_cb.on_rx_data = &stun_sock_on_rx_data;
+    stun_sock_cb.on_status = &stun_sock_on_status;
+    
+    p2p_peer->mapped_addr.addr.sa_family = pj_AF_INET();
+    //    g.peer[i].mapped_addr.addr.sa_family = pj_AF_INET();
+    
+    pj_stun_sock_cfg_default(&ss_cfg);
 #if 1
-        /* make reading the log easier */
-        ss_cfg.ka_interval = 300;
+    /* make reading the log easier */
+    ss_cfg.ka_interval = 300;
 #endif
-        
-        //    name[strlen(name)-1] = '0'+i;
-        status = pj_stun_sock_create(&g.stun_config, NULL, pj_AF_INET(),
-                                     &stun_sock_cb, &ss_cfg,
-                                     p2p_peer, &p2p_peer->stun_sock);
-        if (status != PJ_SUCCESS) {
-            my_perror("pj_stun_sock_create()", status);
-            UNLOCKPOOL(mt_mutex);
-            return status;
-        }
-        
-        //        if (o.stun_server) {
-        server = pj_str(STUN_SERVER);
-        port = PJ_STUN_PORT;
-        //        } else {
-        //            server = pj_str(o.srv_addr);
-        //            port = (pj_uint16_t)(o.srv_port?atoi(o.srv_port):PJ_STUN_PORT);
-        //        }
-        status = pj_stun_sock_start(p2p_peer->stun_sock, &server,
-                                    port,  NULL);
-        if (status != PJ_SUCCESS) {
-            my_perror("pj_stun_sock_start()", status);
-            UNLOCKPOOL(mt_mutex);
-            return status;
-        }
-        
-        //    pj_str_t holeID = pj_str(holePunchingID);
-        p2p_peer->hole_punching_id =  //pj_str((char*)hole_punching_id);
-        strdup(hole_punching_id);
-        
-//        printf("P2P:hole2:%.*s\n", (int)p2p_peer->hole_punching_id.slen , p2p_peer->hole_punching_id.ptr);
-        
-//        const char *test = pj_strbuf(&p2p_peer->hole_punching_id);
-        printf("P2P:hole punching(by strdup):%s\n",p2p_peer->hole_punching_id);
-        
-
-        p2p_peer->result_cb = cb;
-        p2p_peer->receive_cb =cb2;
-        p2p_peer->user_data = user_data;
-        
-        pj_list_insert_before(&g.plist, p2p_peer);
-        
-//        struct peer *matched_peer = find_matched_peer(hole_punching_id);
-        
-        
-        UNLOCKPOOL(mt_mutex);
+    
+    //    name[strlen(name)-1] = '0'+i;
+    status = pj_stun_sock_create(&g.stun_config, NULL, pj_AF_INET(),
+                                 &stun_sock_cb, &ss_cfg,
+                                 p2p_peer, &p2p_peer->stun_sock);
+    if (status != PJ_SUCCESS) {
+        my_perror("pj_stun_sock_create()", status);
+//        UNLOCKPOOL(mt_mutex);
+        return status;
     }
+    
+    //        if (o.stun_server) {
+    server = pj_str(STUN_SERVER);
+    port = PJ_STUN_PORT;
+    //        } else {
+    //            server = pj_str(o.srv_addr);
+    //            port = (pj_uint16_t)(o.srv_port?atoi(o.srv_port):PJ_STUN_PORT);
+    //        }
+    status = pj_stun_sock_start(p2p_peer->stun_sock, &server,
+                                port,  NULL);
+    if (status != PJ_SUCCESS) {
+        my_perror("pj_stun_sock_start()", status);
+//        UNLOCKPOOL(mt_mutex);
+        return status;
+    }
+    
+    //    pj_str_t holeID = pj_str(holePunchingID);
+    p2p_peer->hole_punching_id =  //pj_str((char*)hole_punching_id);
+    strdup(hole_punching_id);
+    
+//        printf("P2P:hole2:%.*s\n", (int)p2p_peer->hole_punching_id.slen , p2p_peer->hole_punching_id.ptr);
+    
+//        const char *test = pj_strbuf(&p2p_peer->hole_punching_id);
+    printf("P2P:hole punching(by strdup):%s\n",p2p_peer->hole_punching_id);
+    
+
+    p2p_peer->result_cb = cb;
+    p2p_peer->receive_cb =cb2;
+    p2p_peer->user_data = user_data;
+    
+    add_peer_in_list(&g.plist, p2p_peer);
+    
+//        struct peer *matched_peer = find_matched_peer(hole_punching_id);
+    
+    
+//    UNLOCKPOOL(mt_mutex);
+//    }
     
     return PJ_SUCCESS;
 }
@@ -415,8 +421,39 @@ int init()
     CHECK( pj_thread_create(g.pool, "stun", &worker_thread, NULL, 0, 0, &g.thread) );
     
     pj_list_init(&g.plist);
+    
     pj_mutex_create(g.pool, "", PJ_MUTEX_SIMPLE, &mt_mutex);
+    
+    pj_mutex_create(g.pool, "", PJ_MUTEX_SIMPLE, &mt_mutex_plist);
+    pj_mutex_create(g.pool, "", PJ_MUTEX_SIMPLE, &mt_mutex_read);
+    pj_mutex_create(g.pool, "", PJ_MUTEX_SIMPLE, &mt_mutex_write);
 
+    
+    return PJ_SUCCESS;
+}
+
+int add_peer_in_list(struct peer *peerlist, struct peer *p2p_peer)
+{
+    if(0 == LOCKPOOL(mt_mutex_plist))
+    {
+        pj_list_insert_before(peerlist, p2p_peer);
+
+        UNLOCKPOOL(mt_mutex_plist);
+    }
+    
+    return PJ_SUCCESS;
+}
+
+int remove_peer_in_list(struct peer *p2p_peer)
+{
+    if(0 == LOCKPOOL(mt_mutex_plist))
+    {
+        pj_list_erase(p2p_peer);
+
+//        pj_list_insert_before(peerlist, p2p_peer);
+        
+        UNLOCKPOOL(mt_mutex_plist);
+    }
     
     return PJ_SUCCESS;
 }
@@ -426,15 +463,21 @@ struct peer* find_matched_peerByPeer(struct peer *peer)
     struct peer *loop_peer;
     struct peer *matched_peer = NULL;
     
-    loop_peer = g.plist.next;
-    while (loop_peer != &g.plist)
+    if(0 == LOCKPOOL(mt_mutex_plist))
     {
-        if (loop_peer==peer) {
-            matched_peer =loop_peer;
-            break;
+    
+        loop_peer = g.plist.next;
+        while (loop_peer != &g.plist)
+        {
+            if (loop_peer==peer) {
+                matched_peer =loop_peer;
+                break;
+            }
+            
+            loop_peer = loop_peer->next;
         }
         
-        loop_peer = loop_peer->next;
+        UNLOCKPOOL(mt_mutex_plist);
     }
     
     return matched_peer;
@@ -445,26 +488,33 @@ struct peer* find_matched_peer(const char* hole_punching_id)
     struct peer *loop_peer;
     struct peer *matched_peer = NULL;
     
-    loop_peer = g.plist.next;
-    while (loop_peer != &g.plist)
+    if(0 == LOCKPOOL(mt_mutex_plist))
     {
-//        printf("%s vs %s",loop_peer->hole_punching_id,hole_punching_id);
-//        printf("size:%lu;%lu",strlen(loop_peer->hole_punching_id),strlen(hole_punching_id));
-        if (strcmp(loop_peer->hole_punching_id, hole_punching_id)==0)//pj_strcmp2(&loop_peer->hole_punching_id,hole_punching_id)==0)
+        loop_peer = g.plist.next;
+        while (loop_peer != &g.plist)
         {
-            matched_peer = loop_peer;
-            break;
+    //        printf("%s vs %s",loop_peer->hole_punching_id,hole_punching_id);
+    //        printf("size:%lu;%lu",strlen(loop_peer->hole_punching_id),strlen(hole_punching_id));
+            if (strcmp(loop_peer->hole_punching_id, hole_punching_id)==0)//pj_strcmp2(&loop_peer->hole_punching_id,hole_punching_id)==0)
+            {
+                matched_peer = loop_peer;
+                break;
+            }
+            
+            loop_peer = loop_peer->next;
         }
         
-        loop_peer = loop_peer->next;
-    }
+        UNLOCKPOOL(mt_mutex_plist);
     
 //    if (matched_peer==NULL) {
 //        return NULL;
 //    }
     
-    if (matched_peer==NULL) {
-        int kk=0;
+//    if (matched_peer==NULL) {
+//        int kk=0;
+//    }
+        
+        
     }
     
     return matched_peer;
@@ -472,7 +522,7 @@ struct peer* find_matched_peer(const char* hole_punching_id)
 
 int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_mapped_ip, int remote_mapped_port, const char *remote_local_ip, int remote_local_port,  stun_punching_result cb1, void *user_data)
 {
-    if(g.inited && 0 == LOCKPOOL(mt_mutex))
+    if(g.inited && 0 == LOCKPOOL(mt_mutex_write))
     {
 //        struct peer *loop_peer;
         //若不清掉上一次的可能這次取到之前的 !!!
@@ -491,7 +541,7 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
 //        }
         
         if (matched_peer==NULL) {
-            UNLOCKPOOL(mt_mutex);
+            UNLOCKPOOL(mt_mutex_write);
             return PJ_SUCCESS;
         }
         
@@ -546,7 +596,7 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
         
         pj_timer_heap_schedule(g.stun_config.timer_heap , entry, &delay);
         
-        UNLOCKPOOL(mt_mutex);
+        UNLOCKPOOL(mt_mutex_write);
 
         
         //            0. 開始timer發punching包, 裡面要寫
@@ -574,7 +624,7 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
 
 int mk_sendata(const char* hole_punching_id, const char *data, int datalen)
 {    
-    if(g.inited && 0 == LOCKPOOL(mt_mutex))
+    if(g.inited && 0 == LOCKPOOL(mt_mutex_write))
     {
         printf("P2P:Send data\n");
 
@@ -585,7 +635,7 @@ int mk_sendata(const char* hole_punching_id, const char *data, int datalen)
         pj_stun_sock_sendto(matched_peer->stun_sock, NULL, data, datalen, 0,
                             remoteAdr, pj_sockaddr_get_len(remoteAdr));
         
-        UNLOCKPOOL(mt_mutex);
+        UNLOCKPOOL(mt_mutex_write);
     }
     
     return 0;
@@ -593,38 +643,52 @@ int mk_sendata(const char* hole_punching_id, const char *data, int datalen)
 
 int mk_close_sock(const char* hole_punching_id)
 {
-    if(g.inited && 0 == LOCKPOOL(mt_mutex))
+    if(g.inited)
     {
-//        struct peer *loop_peer;
-        struct peer *matched_peer = find_matched_peer(hole_punching_id);
-        
-
-//        loop_peer = g.plist.next;
-//        while (loop_peer != &g.plist)
-//        {
-//            if (pj_strcmp2(&loop_peer->hole_punching_id,hole_punching_id)==0)
-//            {
-//                matched_peer = loop_peer;
-//                break;
-//            }
-//            
-//            loop_peer = loop_peer->next;
-//        }
-        
-        if (matched_peer==NULL) {
-            UNLOCKPOOL(mt_mutex);
-            return PJ_SUCCESS;
+        if(0 == LOCKPOOL(mt_mutex_read))
+        {
+            if (0==LOCKPOOL(mt_mutex_write))
+            {
+                
+            
+    //        struct peer *loop_peer;
+                struct peer *matched_peer = find_matched_peer(hole_punching_id);
+                
+        //        loop_peer = g.plist.next;
+        //        while (loop_peer != &g.plist)
+        //        {
+        //            if (pj_strcmp2(&loop_peer->hole_punching_id,hole_punching_id)==0)
+        //            {
+        //                matched_peer = loop_peer;
+        //                break;
+        //            }
+        //            
+        //            loop_peer = loop_peer->next;
+        //        }
+                
+                if (matched_peer==NULL) {
+                    UNLOCKPOOL(mt_mutex_write);
+                    UNLOCKPOOL(mt_mutex_read);
+                    return PJ_SUCCESS;
+                }
+                
+                matched_peer->punching_status=PUNCHING_FAIL;
+                
+                
+                sock_destory(matched_peer->stun_sock);
+                
+                free(matched_peer->hole_punching_id);
+                
+                remove_peer_in_list(matched_peer);
+        //        pj_list_erase(matched_peer);
+                
+                free(matched_peer);
+                
+                UNLOCKPOOL(mt_mutex_write);
+            }
+            
+            UNLOCKPOOL(mt_mutex_read);
         }
-        
-        matched_peer->punching_status=PUNCHING_FAIL;
-        
-        sock_destory(matched_peer->stun_sock);
-        
-        pj_list_erase(matched_peer);
-        free(matched_peer->hole_punching_id);
-        free(matched_peer);
-        
-        UNLOCKPOOL(mt_mutex);
     }
     
     return PJ_SUCCESS;
@@ -678,6 +742,13 @@ static int client_shutdown()
     
     DEINITPOOLLOCK(mt_mutex);
 
+    DEINITPOOLLOCK(mt_mutex_plist);
+
+    DEINITPOOLLOCK(mt_mutex_read);
+
+    DEINITPOOLLOCK(mt_mutex_write);
+
+
     pj_pool_factory_dump(&g.cp.factory, PJ_TRUE);
     pj_caching_pool_destroy(&g.cp);
     
@@ -718,10 +789,16 @@ static pj_bool_t stun_sock_on_status(pj_stun_sock *stun_sock,
 				     pj_stun_sock_op op,
 				     pj_status_t status)
 {
-    if(0 == LOCKPOOL(mt_mutex))
+    if(0 == LOCKPOOL(mt_mutex_read))
     {
         struct peer *peer = (struct peer*) pj_stun_sock_get_user_data(stun_sock);
 
+        if (peer==NULL) {
+            
+            UNLOCKPOOL(mt_mutex_read);
+            
+            return PJ_FALSE;
+        }
         
 //        struct peer *loop_peer;
         
@@ -740,7 +817,7 @@ static pj_bool_t stun_sock_on_status(pj_stun_sock *stun_sock,
         
         if (matched_peer==NULL) {
             
-            UNLOCKPOOL(mt_mutex);
+            UNLOCKPOOL(mt_mutex_read);
 
             return PJ_FALSE;
         }
@@ -762,7 +839,7 @@ static pj_bool_t stun_sock_on_status(pj_stun_sock *stun_sock,
                                     NULL,NULL,
                                     PJ_FALSE,matched_peer->user_data);
             
-            UNLOCKPOOL(mt_mutex);
+            UNLOCKPOOL(mt_mutex_read);
 
             return PJ_FALSE;
         }
@@ -811,7 +888,7 @@ static pj_bool_t stun_sock_on_status(pj_stun_sock *stun_sock,
             }
         }
      
-        UNLOCKPOOL(mt_mutex);
+        UNLOCKPOOL(mt_mutex_read);
     }
 
     return PJ_TRUE;
@@ -823,14 +900,19 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
 				      const pj_sockaddr_t *src_addr,
 				      unsigned addr_len)
 {
-    if(0 == LOCKPOOL(mt_mutex))
+    if(0 == LOCKPOOL(mt_mutex_read))
     {
         struct peer *peer = (struct peer*) pj_stun_sock_get_user_data(stun_sock);
+        
+        if (peer==NULL) {
+            UNLOCKPOOL(mt_mutex_read);
+            return PJ_FALSE;
+        }
         
         struct peer *matched_peer = find_matched_peerByPeer(peer);
         
         if (matched_peer==NULL) {
-            UNLOCKPOOL(mt_mutex);
+            UNLOCKPOOL(mt_mutex_read);
             return PJ_FALSE;
         }
         
@@ -930,7 +1012,7 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
             
         }
         
-        UNLOCKPOOL(mt_mutex);
+        UNLOCKPOOL(mt_mutex_read);
 
     }
 
