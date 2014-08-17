@@ -563,9 +563,46 @@ int mk_start_hole_punching(const char* hole_punching_id,  const char *remote_map
             pj_uint16_t port=(pj_uint16_t)remote_local_port;
             pj_sockaddr_init(pj_AF_INET(), &dst, &ns, port);
             
+            
+//            if (dst.addr.sa_family == PJ_AF_INET) {
+//                int kkk = 0;
+//            }
+//            
+//            if (dst.addr.sa_family == PJ_AF_INET6) {
+//                int kkk=0;
+//            }
+//            
+//            
+//            printf("dst fam:%d\n",dst.addr.sa_family);
+            
 //            p2p_peer->mapped_addr.addr.sa_family = pj_AF_INET();
 
+            
+//            char str1[PJ_INET6_ADDRSTRLEN+10];
+//            pj_sockaddr_print(&dst, str1, sizeof(str1), 3);
+//            
+//            printf("dst:%s\n",str1);
+            
             matched_peer->remote_target_addr = dst;
+            
+            
+//            if (matched_peer->remote_target_addr.addr.sa_family == PJ_AF_INET) {
+//                int kkk = 0;
+//            }
+//            
+//            if (matched_peer->remote_target_addr.addr.sa_family == PJ_AF_INET6) {
+//                int kkk=0;
+//            }
+//            
+//            
+//            printf("remote dst fam:%d\n",matched_peer->remote_target_addr.addr.sa_family);
+//            
+//            char str2[PJ_INET6_ADDRSTRLEN+10];
+//            pj_sockaddr_print(&(matched_peer->remote_target_addr), str2, sizeof(str2), 3);
+//            
+//            printf("remote dst:%s\n",str2);
+            
+            
             
 //            pj_stun_sock_sendto(peer->stun_sock, NULL, input, strlen(input)+1, 0,
 //                                &dst2A, pj_sockaddr_get_len(&dst2A));
@@ -936,10 +973,29 @@ static pj_bool_t stun_sock_on_rx_data(pj_stun_sock *stun_sock,
                 //send back
                 char punching_byte = BYTE_PUNCHING_RESPONSE;
                 
-                pj_sockaddr *remoteAdr = &(matched_peer->remote_target_addr);
+                
+//                pj_sockaddr *remoteAdr = &(matched_peer->remote_target_addr);
+
+//                if (matched_peer->remote_target_addr.addr.sa_family == PJ_AF_INET) {
+//                    int kkk = 0;
+//                    printf("crash1\n");
+//                }
+//                
+//                if (matched_peer->remote_target_addr.addr.sa_family == PJ_AF_INET6) {
+//                    int kkk=0;
+//                    printf("crash2\n");
+//                }
+//                
+//                printf("dst fam:%d\n",matched_peer->remote_target_addr.addr.sa_family);
+//                
+//                char str1[PJ_INET6_ADDRSTRLEN+10];
+//                pj_sockaddr_print(&(matched_peer->remote_target_addr), str1, sizeof(str1), 3);
+//                
+//                printf("dst:%s\n",str1);
+//                
                 
                 pj_stun_sock_sendto(peer->stun_sock, NULL, &punching_byte, 1, 0,
-                                    remoteAdr, pj_sockaddr_get_len(remoteAdr));
+                                    src_addr, pj_sockaddr_get_len(src_addr));
             }
             else if (*only_byte==BYTE_PUNCHING_RESPONSE)
             {
