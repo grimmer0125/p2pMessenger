@@ -14,10 +14,20 @@
 		4D81597F1712C6CA0013A485 /* Pusher.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D81597E1712C6CA0013A485 /* Pusher.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D5C4E7E0F2A4C92B9D85932 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F700C4637DC43EFA335D40F /* libPods.a */; };
 		6D926C9364F64493B0A7BE5A /* libPods-specs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34CD0B6EB8B94D28B0AEC265 /* libPods-specs.a */; };
+		8EB2A6F61998C4E300CE1CFB /* stun_hole_puncher.c in Sources */ = {isa = PBXBuildFile; fileRef = 8EB2A6F41998C4E300CE1CFB /* stun_hole_puncher.c */; };
+		8EB2A6F71998C4E300CE1CFB /* stun_hole_puncher.c in Sources */ = {isa = PBXBuildFile; fileRef = 8EB2A6F41998C4E300CE1CFB /* stun_hole_puncher.c */; };
+		8EB2A6F81998C4E300CE1CFB /* stun_hole_puncher.h in Headers */ = {isa = PBXBuildFile; fileRef = 8EB2A6F51998C4E300CE1CFB /* stun_hole_puncher.h */; };
+		8EB2A7051998C54C00CE1CFB /* libpj-arm-apple-darwin9.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB2A7021998C54C00CE1CFB /* libpj-arm-apple-darwin9.a */; };
+		8EB2A7061998C54C00CE1CFB /* libpj-arm-apple-darwin9.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB2A7021998C54C00CE1CFB /* libpj-arm-apple-darwin9.a */; };
+		8EB2A7071998C54C00CE1CFB /* libpjlib-util-arm-apple-darwin9.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB2A7031998C54C00CE1CFB /* libpjlib-util-arm-apple-darwin9.a */; };
+		8EB2A7081998C54C00CE1CFB /* libpjlib-util-arm-apple-darwin9.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB2A7031998C54C00CE1CFB /* libpjlib-util-arm-apple-darwin9.a */; };
+		8EB2A7091998C54C00CE1CFB /* libpjnath-arm-apple-darwin9.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB2A7041998C54C00CE1CFB /* libpjnath-arm-apple-darwin9.a */; };
+		8EB2A70A1998C54C00CE1CFB /* libpjnath-arm-apple-darwin9.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB2A7041998C54C00CE1CFB /* libpjnath-arm-apple-darwin9.a */; };
 		8ED28249197A208800906180 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8ED28248197A208800906180 /* Images.xcassets */; };
 		8ED2824D197A223400906180 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8ED2824A197A223400906180 /* Icon.png */; };
 		8ED2824E197A223400906180 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8ED2824B197A223400906180 /* Icon@2x.png */; };
 		8ED2824F197A223400906180 /* Icon120.png in Resources */ = {isa = PBXBuildFile; fileRef = 8ED2824C197A223400906180 /* Icon120.png */; };
+		8EF8FA9E199B964800E0A251 /* JSBadgeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EF8FA9D199B964800E0A251 /* JSBadgeView.m */; };
 		A304896C1667AAB4009511CB /* PTPusherChannelAuthorizationOperationSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = A304895E1667A8A6009511CB /* PTPusherChannelAuthorizationOperationSpec.m */; };
 		A30575D115233CC800DA19BD /* PTPusherPresenceChannelSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = A30575CE15233C1200DA19BD /* PTPusherPresenceChannelSpec.m */; };
 		A317375B155D2D7D007E4BBA /* PTPusherMockConnectionSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = A3173754155D2CDF007E4BBA /* PTPusherMockConnectionSpec.m */; };
@@ -168,11 +178,19 @@
 		3F700C4637DC43EFA335D40F /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D81597E1712C6CA0013A485 /* Pusher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pusher.h; sourceTree = "<group>"; };
 		716CF9036AED411BB87C148E /* libPods-specs.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-specs.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E20C090199C7CE100067854 /* stun_process_const.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stun_process_const.h; sourceTree = "<group>"; };
+		8EB2A6F41998C4E300CE1CFB /* stun_hole_puncher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stun_hole_puncher.c; sourceTree = "<group>"; };
+		8EB2A6F51998C4E300CE1CFB /* stun_hole_puncher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stun_hole_puncher.h; sourceTree = "<group>"; };
+		8EB2A7021998C54C00CE1CFB /* libpj-arm-apple-darwin9.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libpj-arm-apple-darwin9.a"; path = "pjsip/lib/libpj-arm-apple-darwin9.a"; sourceTree = "<group>"; };
+		8EB2A7031998C54C00CE1CFB /* libpjlib-util-arm-apple-darwin9.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libpjlib-util-arm-apple-darwin9.a"; path = "pjsip/lib/libpjlib-util-arm-apple-darwin9.a"; sourceTree = "<group>"; };
+		8EB2A7041998C54C00CE1CFB /* libpjnath-arm-apple-darwin9.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libpjnath-arm-apple-darwin9.a"; path = "pjsip/lib/libpjnath-arm-apple-darwin9.a"; sourceTree = "<group>"; };
 		8ED01C671977A0C6008575F1 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		8ED28248197A208800906180 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = SampleApp/Images.xcassets; sourceTree = "<group>"; };
 		8ED2824A197A223400906180 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		8ED2824B197A223400906180 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
 		8ED2824C197A223400906180 /* Icon120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon120.png; sourceTree = "<group>"; };
+		8EF8FA9C199B964800E0A251 /* JSBadgeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSBadgeView.h; sourceTree = "<group>"; };
+		8EF8FA9D199B964800E0A251 /* JSBadgeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSBadgeView.m; sourceTree = "<group>"; };
 		A304895E1667A8A6009511CB /* PTPusherChannelAuthorizationOperationSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPusherChannelAuthorizationOperationSpec.m; sourceTree = "<group>"; };
 		A30575CE15233C1200DA19BD /* PTPusherPresenceChannelSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPusherPresenceChannelSpec.m; sourceTree = "<group>"; };
 		A30950121525C272008F695B /* PTJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTJSON.m; sourceTree = "<group>"; };
@@ -226,8 +244,8 @@
 		A3A9F96C1496E9E500F83617 /* SpecHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpecHelper.h; sourceTree = "<group>"; };
 		A3A9F96D1496E9E500F83617 /* SpecHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpecHelper.m; sourceTree = "<group>"; };
 		A3AC28B513F75530001C4808 /* PTURLRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTURLRequestOperation.m; sourceTree = "<group>"; };
-		A3AC28BC13F75BF1001C4808 /* PusherExampleMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PusherExampleMenuViewController.h; sourceTree = "<group>"; };
-		A3AC28BD13F75BF1001C4808 /* PusherExampleMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PusherExampleMenuViewController.m; sourceTree = "<group>"; };
+		A3AC28BC13F75BF1001C4808 /* PusherExampleMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PusherExampleMenuViewController.h; path = Sample/Classes/PusherExampleMenuViewController.h; sourceTree = "<group>"; };
+		A3AC28BD13F75BF1001C4808 /* PusherExampleMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PusherExampleMenuViewController.m; path = Sample/Classes/PusherExampleMenuViewController.m; sourceTree = "<group>"; };
 		A3AC28C213F76C50001C4808 /* PTPusherChannelAuthorizationOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPusherChannelAuthorizationOperation.m; sourceTree = "<group>"; };
 		A3B7E4EA1581672A00CDA6DA /* ClientEventsSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClientEventsSpec.m; sourceTree = "<group>"; };
 		A3C32D9A14D083C10017FAED /* PTPusherEventSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPusherEventSpec.m; sourceTree = "<group>"; };
@@ -248,8 +266,8 @@
 		A3D1D29B1157FA80009A12AD /* libPusher-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "libPusher-Info.plist"; sourceTree = "<group>"; };
 		A3D1D2B71158013F009A12AD /* libPusher.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPusher.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3E5CBF4184640C3006A54DD /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		A3E5CBF618464164006A54DD /* ReactiveEventsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReactiveEventsViewController.h; sourceTree = "<group>"; };
-		A3E5CBF718464164006A54DD /* ReactiveEventsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReactiveEventsViewController.m; sourceTree = "<group>"; };
+		A3E5CBF618464164006A54DD /* ReactiveEventsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReactiveEventsViewController.h; path = Sample/Classes/ReactiveEventsViewController.h; sourceTree = "<group>"; };
+		A3E5CBF718464164006A54DD /* ReactiveEventsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReactiveEventsViewController.m; path = Sample/Classes/ReactiveEventsViewController.m; sourceTree = "<group>"; };
 		A3E5CBF918464227006A54DD /* ReactiveEventsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ReactiveEventsViewController.xib; path = Sample/ReactiveEventsViewController.xib; sourceTree = "<group>"; };
 		A3E5CBFB1846461A006A54DD /* PTPusher+ReactiveExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PTPusher+ReactiveExtensions.h"; sourceTree = "<group>"; };
 		A3E5CBFC1846461A006A54DD /* PTPusher+ReactiveExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "PTPusher+ReactiveExtensions.m"; sourceTree = "<group>"; };
@@ -278,7 +296,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8EB2A7071998C54C00CE1CFB /* libpjlib-util-arm-apple-darwin9.a in Frameworks */,
 				A37E160814E4C87500DCA3A6 /* libicucore.dylib in Frameworks */,
+				8EB2A7091998C54C00CE1CFB /* libpjnath-arm-apple-darwin9.a in Frameworks */,
+				8EB2A7051998C54C00CE1CFB /* libpj-arm-apple-darwin9.a in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */,
@@ -326,6 +347,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8EB2A7081998C54C00CE1CFB /* libpjlib-util-arm-apple-darwin9.a in Frameworks */,
+				8EB2A70A1998C54C00CE1CFB /* libpjnath-arm-apple-darwin9.a in Frameworks */,
+				8EB2A7061998C54C00CE1CFB /* libpj-arm-apple-darwin9.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,6 +407,18 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				8EF8FA9B199B964800E0A251 /* JSBadgeView */,
+				8EB2A7021998C54C00CE1CFB /* libpj-arm-apple-darwin9.a */,
+				8EB2A7031998C54C00CE1CFB /* libpjlib-util-arm-apple-darwin9.a */,
+				8EB2A7041998C54C00CE1CFB /* libpjnath-arm-apple-darwin9.a */,
+				8E20C090199C7CE100067854 /* stun_process_const.h */,
+				A3E5CBF618464164006A54DD /* ReactiveEventsViewController.h */,
+				A3E5CBF718464164006A54DD /* ReactiveEventsViewController.m */,
+				A3E5CBF918464227006A54DD /* ReactiveEventsViewController.xib */,
+				8EB2A6F51998C4E300CE1CFB /* stun_hole_puncher.h */,
+				8EB2A6F41998C4E300CE1CFB /* stun_hole_puncher.c */,
+				A3AC28BC13F75BF1001C4808 /* PusherExampleMenuViewController.h */,
+				A3AC28BD13F75BF1001C4808 /* PusherExampleMenuViewController.m */,
 				8ED2824A197A223400906180 /* Icon.png */,
 				8ED2824B197A223400906180 /* Icon@2x.png */,
 				8ED2824C197A223400906180 /* Icon120.png */,
@@ -432,6 +468,15 @@
 				34CD0B6EB8B94D28B0AEC265 /* libPods-specs.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8EF8FA9B199B964800E0A251 /* JSBadgeView */ = {
+			isa = PBXGroup;
+			children = (
+				8EF8FA9C199B964800E0A251 /* JSBadgeView.h */,
+				8EF8FA9D199B964800E0A251 /* JSBadgeView.m */,
+			);
+			path = JSBadgeView;
 			sourceTree = "<group>";
 		};
 		A3173757155D2D12007E4BBA /* Testing */ = {
@@ -538,14 +583,10 @@
 				A39E238813F7E6AB0083CAD7 /* PusherPresenceEventsViewController.m */,
 				A3FE41C811811161009CF5D7 /* NewEventViewController.h */,
 				A3FE41C911811161009CF5D7 /* NewEventViewController.m */,
-				A3AC28BC13F75BF1001C4808 /* PusherExampleMenuViewController.h */,
-				A3AC28BD13F75BF1001C4808 /* PusherExampleMenuViewController.m */,
 				A3698FEC13FF0868005CF130 /* NSMutableURLRequest+BasicAuth.h */,
 				A3698FED13FF0868005CF130 /* NSMutableURLRequest+BasicAuth.m */,
 				A3698FFD13FF200C005CF130 /* NSData+Base64.h */,
 				A3698FFE13FF200C005CF130 /* NSData+Base64.m */,
-				A3E5CBF618464164006A54DD /* ReactiveEventsViewController.h */,
-				A3E5CBF718464164006A54DD /* ReactiveEventsViewController.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -571,7 +612,6 @@
 				A3FE41CA11811161009CF5D7 /* NewEventViewController.xib */,
 				A3D1D2831157FA30009A12AD /* MainWindow.xib */,
 				A3D1D2851157FA30009A12AD /* PusherEventsViewController.xib */,
-				A3E5CBF918464227006A54DD /* ReactiveEventsViewController.xib */,
 			);
 			name = Resources;
 			path = ..;
@@ -615,6 +655,7 @@
 				A3E5CC4918466CD5006A54DD /* PTPusherChannel_Private.h in Headers */,
 				A3CA670E14DBBAA1003E2F1E /* PTPusherErrors.h in Headers */,
 				A37E167414E572C900DCA3A6 /* PTPusherMacros.h in Headers */,
+				8EB2A6F81998C4E300CE1CFB /* stun_hole_puncher.h in Headers */,
 				A317375F155D38C4007E4BBA /* PTPusher+Testing.h in Headers */,
 				A3226317155D481C00A46067 /* PTPusherMockConnection.h in Headers */,
 				4D81597F1712C6CA0013A485 /* Pusher.h in Headers */,
@@ -998,12 +1039,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				A3D1D2861157FA30009A12AD /* PusherEventsAppDelegate.m in Sources */,
+				8EB2A6F61998C4E300CE1CFB /* stun_hole_puncher.c in Sources */,
 				A3D1D2871157FA30009A12AD /* PusherEventsViewController.m in Sources */,
 				A3D1D2881157FA30009A12AD /* main.m in Sources */,
 				A3FE41CB11811161009CF5D7 /* NewEventViewController.m in Sources */,
 				A39E238913F7E6AB0083CAD7 /* PusherPresenceEventsViewController.m in Sources */,
 				A3698FF213FF0A7A005CF130 /* NSMutableURLRequest+BasicAuth.m in Sources */,
 				A3698FFF13FF200C005CF130 /* NSData+Base64.m in Sources */,
+				8EF8FA9E199B964800E0A251 /* JSBadgeView.m in Sources */,
 				A3E5CBF818464164006A54DD /* ReactiveEventsViewController.m in Sources */,
 				A37E15EA14E4BBBA00DCA3A6 /* PusherExampleMenuViewController.m in Sources */,
 			);
@@ -1042,6 +1085,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A3FE44E71181C3C5009CF5D7 /* NSDictionary+QueryString.m in Sources */,
+				8EB2A6F71998C4E300CE1CFB /* stun_hole_puncher.c in Sources */,
 				A3D1D2CA11580162009A12AD /* PTPusher.m in Sources */,
 				A3D1D2CC11580162009A12AD /* PTPusherEvent.m in Sources */,
 				A3FE429F11811EEE009CF5D7 /* NSString+Hashing.m in Sources */,
@@ -1111,8 +1155,21 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = libPusher_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					"${PODS_ROOT}/Headers/Reachability",
+					"${PODS_ROOT}/Headers/OHHTTPStubs",
+					"${PODS_ROOT}/Headers/Kiwi",
+					"$(SRCROOT)/pjsip/src/pjlib-util/include",
+					"$(SRCROOT)/pjsip/src/pjnath/include",
+					"$(SRCROOT)/pjsip/src/pjlib/include",
+					"${PODS_ROOT}/Headers/SocketRocket",
+					"${PODS_ROOT}/Headers/ReactiveCocoa/ReactiveCocoa",
+					"${PODS_ROOT}/Headers/ReactiveCocoa",
+					"${PODS_ROOT}/Headers",
+				);
 				INFOPLIST_FILE = "libPusher-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = p2pMessenger;
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -1133,8 +1190,21 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = libPusher_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					"${PODS_ROOT}/Headers/Reachability",
+					"${PODS_ROOT}/Headers/OHHTTPStubs",
+					"${PODS_ROOT}/Headers/Kiwi",
+					"$(SRCROOT)/pjsip/src/pjlib-util/include",
+					"$(SRCROOT)/pjsip/src/pjnath/include",
+					"$(SRCROOT)/pjsip/src/pjlib/include",
+					"${PODS_ROOT}/Headers/SocketRocket",
+					"${PODS_ROOT}/Headers/ReactiveCocoa/ReactiveCocoa",
+					"${PODS_ROOT}/Headers/ReactiveCocoa",
+					"${PODS_ROOT}/Headers",
+				);
 				INFOPLIST_FILE = "libPusher-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = p2pMessenger;
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -1275,6 +1345,11 @@
 					"kPTPusherClientLibraryVersion=@\"$(CURRENT_PROJECT_VERSION)\"",
 				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/pjsip/lib",
+					"$(PROJECT_DIR)/pjsip/src/third_party/lib",
+				);
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = Pusher;
 				SDKROOT = iphoneos;
@@ -1298,6 +1373,11 @@
 					"kPTPusherClientLibraryVersion=@\"$(CURRENT_PROJECT_VERSION)\"",
 				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/pjsip/lib",
+					"$(PROJECT_DIR)/pjsip/src/third_party/lib",
+				);
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = Pusher;
 				SDKROOT = iphoneos;
@@ -1358,6 +1438,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A315780A14D0751C000136A9 /* Pods.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1.1;
 				DYLIB_CURRENT_VERSION = 1.1;
@@ -1366,14 +1447,32 @@
 					"$(inherited)",
 					"COCOAPODS=1",
 					DEBUG,
+					"PJ_AUTOCONF=1",
 				);
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"${PODS_ROOT}/Headers",
+					"${PODS_ROOT}/Headers/Kiwi",
+					"${PODS_ROOT}/Headers/OHHTTPStubs",
+					"${PODS_ROOT}/Headers/Reachability",
+					"${PODS_ROOT}/Headers/ReactiveCocoa",
+					"${PODS_ROOT}/Headers/ReactiveCocoa/ReactiveCocoa",
+					"${PODS_ROOT}/Headers/SocketRocket",
+					"$(SRCROOT)/pjsip/src/pjlib/include",
+					"$(SRCROOT)/pjsip/src/pjnath/include",
+					"$(SRCROOT)/pjsip/src/pjlib-util/include",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/pjsip/lib",
+					"$(SRCROOT)/pjsip",
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "$(inherited)";
 				SDKROOT = iphoneos;
+				VALID_ARCHS = "arm64 armv7 armv7s";
 				WARNING_CFLAGS = "-Wno-arc-performSelector-leaks";
 			};
 			name = Debug;
@@ -1382,16 +1481,39 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A315780A14D0751C000136A9 /* Pods.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1.1;
 				DYLIB_CURRENT_VERSION = 1.1;
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"PJ_AUTOCONF=1",
+				);
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"${PODS_ROOT}/Headers",
+					"${PODS_ROOT}/Headers/Kiwi",
+					"${PODS_ROOT}/Headers/OHHTTPStubs",
+					"${PODS_ROOT}/Headers/Reachability",
+					"${PODS_ROOT}/Headers/ReactiveCocoa",
+					"${PODS_ROOT}/Headers/ReactiveCocoa/ReactiveCocoa",
+					"${PODS_ROOT}/Headers/SocketRocket",
+					"$(SRCROOT)/pjsip/src/pjlib/include",
+					"$(SRCROOT)/pjsip/src/pjnath/include",
+					"$(SRCROOT)/pjsip/src/pjlib-util/include",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/pjsip/lib",
+					"$(SRCROOT)/pjsip",
+				);
 				OTHER_LDFLAGS = "$(inherited)";
 				SDKROOT = iphoneos;
+				VALID_ARCHS = "arm64 armv7 armv7s";
 				WARNING_CFLAGS = "-Wno-arc-performSelector-leaks";
 			};
 			name = Release;
