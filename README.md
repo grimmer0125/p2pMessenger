@@ -1,6 +1,6 @@
 # p2pMessenger
 
-It is based on libPusher and PJSIP. It is based on P2P + websocket. 
+It uses the following two library and implements the algorithm of P2P hole punching.  
 
 # libPusher
 https://github.com/lukeredpath/libPusher
