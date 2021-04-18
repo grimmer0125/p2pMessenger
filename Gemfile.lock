@@ -75,8 +75,8 @@ GEM
       httpclient (~> 2.3.0)
       multi_json (~> 1.0)
       signature (~> 0.1.6)
-    rack (1.5.2)
-    rack-protection (1.5.3)
+    rack (1.6.13)
+    rack-protection (1.5.5)
       rack
     rake (10.3.2)
     rest-client (1.7.1)
