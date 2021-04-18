@@ -4,7 +4,7 @@ It uses the following two libraries to finish a iOS app to demonstrate the proce
 
 ## libPusher
 
-https://github.com/lukeredpath/libPusher. This is used to implement the signaling part. 
+https://github.com/lukeredpath/libPusher. This websocket library is used to implement the signaling part. 
 
 License: MIT. Copyright (c) 2010 Luke Redpath
 
